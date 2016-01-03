@@ -21,16 +21,20 @@ import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_INVALID_ENUM;
 import static org.lwjgl.opengl.GL11.GL_INVALID_OPERATION;
 import static org.lwjgl.opengl.GL11.GL_INVALID_VALUE;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_OUT_OF_MEMORY;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_STACK_OVERFLOW;
 import static org.lwjgl.opengl.GL11.GL_STACK_UNDERFLOW;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
@@ -77,6 +81,7 @@ public class Game {
 			throw new RuntimeException("Could not initialise GLFW.");
 		}
 		createWindow();
+		createWindow();
 	}
 	private static void createWindow() {
 		glfwDefaultWindowHints();
@@ -86,8 +91,8 @@ public class Game {
 		long old = window;
 		window = glfwCreateWindow(width, height, title, fullscreen ? glfwGetPrimaryMonitor() : NULL, old);
 		if (old != NULL) {
-			Callbacks.glfwReleaseCallbacks(window);
-			glfwDestroyWindow(window);
+			Callbacks.glfwReleaseCallbacks(old);
+			glfwDestroyWindow(old);
 		}
 		
 		glfwSetFramebufferSizeCallback(window, resizeCallback = new GLFWFramebufferSizeCallback() {
@@ -97,7 +102,6 @@ public class Game {
 				glLoadIdentity();
 				glOrtho(0, width, height, 0, 1, -1);
 				glMatrixMode(GL_MODELVIEW);
-				glLoadIdentity();
 			}
 		});
 		
@@ -116,8 +120,10 @@ public class Game {
 		glfwMakeContextCurrent(window);
 		if (old == NULL) {
 			GL.createCapabilities();
-			glEnable(GL_TEXTURE_2D);
 		}
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	public static void start() {
 		glfwShowWindow(window);
