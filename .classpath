@@ -2,11 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/jar/jogg-0.0.7.jar"/>
-	<classpathentry kind="lib" path="lib/jar/jorbis-0.0.15.jar"/>
-	<classpathentry kind="lib" path="lib/jar/steelplate-core.jar"/>
-	<classpathentry kind="lib" path="lib/jar/steelplate-desktop.jar"/>
-	<classpathentry kind="lib" path="lib/jar/tritonus_share.jar"/>
-	<classpathentry kind="lib" path="lib/jar/vorbisspi1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/jar/lwjgl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Card-Player/lib/native"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
