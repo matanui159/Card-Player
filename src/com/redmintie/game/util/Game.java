@@ -39,6 +39,7 @@ import java.io.PrintStream;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
@@ -49,7 +50,6 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
 
 import com.redmintie.game.util.graphics.Canvas;
-import com.sun.scenario.effect.impl.BufferUtil;
 
 public class Game {
 	private static String title = "Game";
@@ -94,7 +94,7 @@ public class Game {
 			throw new RuntimeException("Could not initialise GLFW.");
 		}
 		
-		size = BufferUtil.newIntBuffer(1);
+		size = BufferUtils.createIntBuffer(1);
 		createWindow();
 	}
 	private static void createWindow() {
