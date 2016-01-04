@@ -5,7 +5,6 @@ import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.stb.STBImageWrite.stbi_write_png;
 import static org.lwjgl.stb.STBTruetype.stbtt_BakeFontBitmap;
 import static org.lwjgl.stb.STBTruetype.stbtt_GetBakedQuad;
 import static org.lwjgl.system.jemalloc.JEmalloc.je_free;
@@ -39,17 +38,12 @@ public class Font implements Resource {
 		
 		int offset = 0;
 		int diff;
-		int i = 0;
 		while ((diff = -stbtt_BakeFontBitmap(buffer, size, data, BITMAP_SIZE, BITMAP_SIZE, offset, chars)) > 0) {
-			stbi_write_png(path + i + ".png", BITMAP_SIZE, BITMAP_SIZE, 1, data, 0);
 			Arrays.fill(bitmaps, offset, offset + diff, TextureUtil.createTexture(data, BITMAP_SIZE, BITMAP_SIZE,
 					GL_ALPHA, filter, GL_CLAMP_TO_EDGE));
 			offset += diff;
 			chars.position(offset);
-			i++;
 		}
-		System.out.println(i);
-		stbi_write_png(path + i + ".png", BITMAP_SIZE, BITMAP_SIZE, 1, data, 0);
 		Arrays.fill(bitmaps, offset, CHARACTERS, TextureUtil.createTexture(data, BITMAP_SIZE, BITMAP_SIZE,
 				GL_ALPHA, filter, GL_CLAMP_TO_EDGE));
 		chars.rewind();

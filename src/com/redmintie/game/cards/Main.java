@@ -19,8 +19,10 @@ public class Main {
 		}
 		
 		Game.init();
+		
 		Game.addScene("main", new MainScene());
 		Game.setScene("main");
+		
 		Game.start();
 	}
 }
