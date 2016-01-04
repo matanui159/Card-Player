@@ -7,8 +7,6 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.stb.STBTruetype.stbtt_BakeFontBitmap;
 import static org.lwjgl.stb.STBTruetype.stbtt_GetBakedQuad;
-import static org.lwjgl.system.jemalloc.JEmalloc.je_free;
-import static org.lwjgl.system.jemalloc.JEmalloc.je_malloc;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -17,6 +15,7 @@ import java.util.Arrays;
 
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.system.MemoryUtil;
 
 import com.redmintie.game.util.Resource;
 import com.redmintie.game.util.ResourceManager;
@@ -34,7 +33,7 @@ public class Font implements Resource {
 	
 	public Font(String path, int size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
-		ByteBuffer data = je_malloc(BITMAP_SIZE * BITMAP_SIZE);
+		ByteBuffer data = MemoryUtil.memAlloc(BITMAP_SIZE * BITMAP_SIZE);
 		
 		int offset = 0;
 		int diff;
@@ -49,17 +48,17 @@ public class Font implements Resource {
 		chars.rewind();
 		
 		ResourceManager.freeBuffer(buffer);
-		je_free(data);
+		MemoryUtil.memFree(data);
 		ResourceManager.addResource(this);
 	}
 	public Font(String path, int size) throws IOException {
 		this(path, size, FILTER_LINEAR);
 	}
 	public void drawText(String text, double x, double y) {
-		FloatBuffer xBuffer = je_malloc(4).asFloatBuffer();
+		FloatBuffer xBuffer = MemoryUtil.memAllocFloat(1);
 		xBuffer.put((float)x).flip();
 		
-		FloatBuffer yBuffer = je_malloc(4).asFloatBuffer();
+		FloatBuffer yBuffer = MemoryUtil.memAllocFloat(1);
 		yBuffer.put((float)y).flip();
 		
 		for (int i = 0; i < text.length(); i++) {
@@ -70,8 +69,8 @@ public class Font implements Resource {
 						QUAD.s0(), QUAD.t0(), QUAD.s1(), QUAD.t1());
 			}
 		}
-		je_free(xBuffer);
-		je_free(yBuffer);
+		MemoryUtil.memFree(xBuffer);
+		MemoryUtil.memFree(yBuffer);
 	}
 	@Override
 	public void destroy() {

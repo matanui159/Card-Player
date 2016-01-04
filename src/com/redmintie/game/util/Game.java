@@ -79,6 +79,9 @@ public class Game {
 		if (Flags.DEBUG) {
 			System.setProperty("org.lwjgl.util.Debug", "true");
 		}
+		if (Flags.TRACK_LEAKS) {
+			System.setProperty("org.lwjgl.util.DebugAllocator", "true");
+		}
 		if (Flags.LOG != null) {
 			try {
 				FileOutputStream file = new FileOutputStream(Flags.LOG);

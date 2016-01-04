@@ -1,13 +1,12 @@
 package com.redmintie.game.util;
 
-import static org.lwjgl.system.jemalloc.JEmalloc.je_free;
-import static org.lwjgl.system.jemalloc.JEmalloc.je_malloc;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+
+import org.lwjgl.system.MemoryUtil;
 
 public class ResourceManager {
 	private static final byte[] BUFFER = new byte[65536];
@@ -21,7 +20,7 @@ public class ResourceManager {
 	}
 	public static ByteBuffer getResourceAsBuffer(String path) throws IOException {
 		InputStream stream = getResourceAsStream(path);
-		ByteBuffer buffer = je_malloc(stream.available());
+		ByteBuffer buffer = MemoryUtil.memAlloc(stream.available());
 		int length;
 		while ((length = stream.read(BUFFER)) != -1) {
 			buffer.put(BUFFER, 0, length);
@@ -31,7 +30,7 @@ public class ResourceManager {
 		return buffer;
 	}
 	public static void freeBuffer(ByteBuffer buffer) {
-		je_free(buffer);
+		MemoryUtil.memFree(buffer);
 	}
 	public static void addResource(Resource resource) {
 		resources.add(resource);
