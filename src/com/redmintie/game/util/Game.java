@@ -185,7 +185,7 @@ public class Game {
 		}
 	}
 	public static void end() {
-		ResourceManager.releaseResources();
+		ResourceManager.destroyResources();
 		Callbacks.glfwReleaseCallbacks(window);
 		glfwDestroyWindow(window);
 		glfwTerminate();
