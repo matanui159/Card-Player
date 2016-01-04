@@ -2,14 +2,17 @@ package com.redmintie.game.cards;
 
 import com.redmintie.game.cards.scenes.MainScene;
 import com.redmintie.game.util.Game;
+import com.redmintie.game.util.input.Input;
 
 public class Main {
 	public static void main(String[] args) {
 		setFlag("com.redmintie.DEBUG", "true");
 		setFlag("com.redmintie.LOG", "log.txt");
-		setFlag("com.redmintie.TRACKLEAKS", "true");
 		
 		Game.init();
+		
+		Game.setFullscreen(true);
+		Input.setCursorMode(Input.CURSOR_DISABLED);
 		
 		Game.addScene("main", new MainScene());
 		Game.setScene("main");

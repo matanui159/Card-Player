@@ -3,7 +3,7 @@ package com.redmintie.game.util;
 public class Scene {
 	public void init() {
 	}
-	public void update() {
+	public void update(double delta) {
 	}
 	public void draw() {
 	}

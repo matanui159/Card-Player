@@ -11,6 +11,7 @@ import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
@@ -50,6 +51,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
 
 import com.redmintie.game.util.graphics.Canvas;
+import com.redmintie.game.util.input.Input;
 
 public class Game {
 	private static String title = "Game";
@@ -69,7 +71,7 @@ public class Game {
 	
 	//TODO: mouse move and scroll callbacks
 	
-	private static long window = NULL;
+	protected static long window = NULL;
 	private static boolean running;
 	
 	private static HashMap<String, Scene> scenes = new HashMap<String, Scene>();
@@ -100,7 +102,7 @@ public class Game {
 		size = BufferUtils.createIntBuffer(1);
 		createWindow();
 	}
-	private static void createWindow() {
+	protected static void createWindow() {
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, resizable ? GLFW_TRUE : GLFW_FALSE);
@@ -117,6 +119,7 @@ public class Game {
 			Callbacks.glfwReleaseCallbacks(old);
 			glfwDestroyWindow(old);
 		}
+		Input.setCursorMode(Input.getCursorMode());
 		
 		glfwSetFramebufferSizeCallback(window, resizeCallback = new GLFWFramebufferSizeCallback() {
 			public void invoke(long window, int width, int height) {
@@ -192,16 +195,22 @@ public class Game {
 		glfwShowWindow(window);
 		Canvas.resize();
 		
+		if (scene != null) {
+			scene.init();
+		}
+		
+		double last = glfwGetTime();
 		while (glfwWindowShouldClose(window) == GLFW_FALSE) {
 			glfwPollEvents();
 			
+			double time = glfwGetTime();
 			if (scene != null) {
-				scene.update();
+				scene.update(time - last);
 				scene.draw();
 			}
+			last = time;
 			
 			glfwSwapBuffers(window);
-			GLUtil.checkGLError();
 		}
 		end();
 	}
@@ -212,18 +221,25 @@ public class Game {
 		setScene(scenes.get(scene));
 	}
 	public static void setScene(Scene scene) {
-		if (Game.scene != null) {
+		if (running && Game.scene != null) {
 			Game.scene.end();
 		}
 		Game.scene = scene;
-		scene.init();
+		if (running) {
+			scene.init();
+		}
 	}
 	public static void end() {
+		if (scene != null) {
+			scene.end();
+		}
 		ResourceManager.destroyResources();
+		
 		Callbacks.glfwReleaseCallbacks(window);
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		errorCallback.release();
+		
 		System.exit(0);
 	}
 }

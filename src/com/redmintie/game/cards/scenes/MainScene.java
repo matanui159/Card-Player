@@ -20,6 +20,9 @@ public class MainScene extends Scene {
 			Game.end();
 		}
 	}
+	public void init() {
+//		Input.setCursorMode(Input.CURSOR_DISABLED);
+	}
 	public void draw() {
 		Canvas.clear(0, 0, 0);
 
