@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.system.MemoryUtil;
@@ -26,6 +27,9 @@ public class Font implements Resource {
 	
 	private static final int BITMAP_SIZE = 512;
 	private static final int CHARACTERS = 256;
+	
+	private static final FloatBuffer xBuffer = BufferUtils.createFloatBuffer(1);
+	private static final FloatBuffer yBuffer = BufferUtils.createFloatBuffer(1);
 	private static final STBTTAlignedQuad QUAD = STBTTAlignedQuad.create();
 	
 	private STBTTBakedChar.Buffer chars = STBTTBakedChar.callocBuffer(CHARACTERS);
@@ -55,10 +59,7 @@ public class Font implements Resource {
 		this(path, size, FILTER_LINEAR);
 	}
 	public void drawText(String text, double x, double y) {
-		FloatBuffer xBuffer = MemoryUtil.memAllocFloat(1);
 		xBuffer.put((float)x).flip();
-		
-		FloatBuffer yBuffer = MemoryUtil.memAllocFloat(1);
 		yBuffer.put((float)y).flip();
 		
 		for (int i = 0; i < text.length(); i++) {
@@ -69,8 +70,6 @@ public class Font implements Resource {
 						QUAD.s0(), QUAD.t0(), QUAD.s1(), QUAD.t1());
 			}
 		}
-		MemoryUtil.memFree(xBuffer);
-		MemoryUtil.memFree(yBuffer);
 	}
 	@Override
 	public void destroy() {
@@ -81,5 +80,6 @@ public class Font implements Resource {
 				last = bitmap;
 			}
 		}
+		MemoryUtil.memFree(chars);
 	}
 }
