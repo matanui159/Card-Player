@@ -11,13 +11,15 @@ import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 import static org.lwjgl.stb.STBImageResize.stbir_resize_uint8;
 import static org.lwjgl.system.MathUtil.mathIsPoT;
 import static org.lwjgl.system.MathUtil.mathRoundPoT;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memAllocInt;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryUtil;
 
 import com.redmintie.game.util.Flags;
 import com.redmintie.game.util.Resource;
@@ -35,18 +37,18 @@ public class Sprite implements Resource {
 	
 	public Sprite(String path, int filter, int wrap) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
-		IntBuffer width = MemoryUtil.memAllocInt(1);
-		IntBuffer height = MemoryUtil.memAllocInt(1);
-		IntBuffer comp = MemoryUtil.memAllocInt(1);
+		IntBuffer width = memAllocInt(1);
+		IntBuffer height = memAllocInt(1);
+		IntBuffer comp = memAllocInt(1);
 		
 		ByteBuffer data = stbi_load_from_memory(buffer, width, height, comp, 4);
 		this.width = width.get();
 		this.height = height.get();
 		
 		ResourceManager.freeBuffer(buffer);
-		MemoryUtil.memFree(width);
-		MemoryUtil.memFree(height);
-		MemoryUtil.memFree(comp);
+		memFree(width);
+		memFree(height);
+		memFree(comp);
 		
 		int w = this.width;
 		int h = this.height;
@@ -62,7 +64,7 @@ public class Sprite implements Resource {
 					System.err.println("[SPRITE]\tTexture may look fuzzy.");
 				}
 				
-				ByteBuffer d = MemoryUtil.memAlloc(w * h * 4);
+				ByteBuffer d = memAlloc(w * h * 4);
 				
 				stbir_resize_uint8(data, this.width, this.height, 0, d, w, h, 0, 4);
 				stbi_image_free(data);
@@ -72,7 +74,7 @@ public class Sprite implements Resource {
 		
 		texture = TextureUtil.createTexture(data, w, h, GL_RGBA, filter, wrap);
 		if (resized) {
-			MemoryUtil.memFree(data);
+			memFree(data);
 		} else {
 			stbi_image_free(data);
 		}

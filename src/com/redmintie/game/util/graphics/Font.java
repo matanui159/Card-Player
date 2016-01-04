@@ -7,6 +7,8 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.stb.STBTruetype.stbtt_BakeFontBitmap;
 import static org.lwjgl.stb.STBTruetype.stbtt_GetBakedQuad;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,7 +18,6 @@ import java.util.Arrays;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
-import org.lwjgl.system.MemoryUtil;
 
 import com.redmintie.game.util.Resource;
 import com.redmintie.game.util.ResourceManager;
@@ -37,7 +38,7 @@ public class Font implements Resource {
 	
 	public Font(String path, int size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
-		ByteBuffer data = MemoryUtil.memAlloc(BITMAP_SIZE * BITMAP_SIZE);
+		ByteBuffer data = memAlloc(BITMAP_SIZE * BITMAP_SIZE);
 		
 		int offset = 0;
 		int diff;
@@ -52,7 +53,7 @@ public class Font implements Resource {
 		chars.rewind();
 		
 		ResourceManager.freeBuffer(buffer);
-		MemoryUtil.memFree(data);
+		memFree(data);
 		ResourceManager.addResource(this);
 	}
 	public Font(String path, int size) throws IOException {
@@ -80,6 +81,6 @@ public class Font implements Resource {
 				last = bitmap;
 			}
 		}
-		MemoryUtil.memFree(chars);
+		memFree(chars);
 	}
 }
