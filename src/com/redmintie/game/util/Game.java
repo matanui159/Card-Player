@@ -26,26 +26,19 @@ import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_INVALID_ENUM;
-import static org.lwjgl.opengl.GL11.GL_INVALID_OPERATION;
-import static org.lwjgl.opengl.GL11.GL_INVALID_VALUE;
-import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_OUT_OF_MEMORY;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STACK_OVERFLOW;
-import static org.lwjgl.opengl.GL11.GL_STACK_UNDERFLOW;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGetError;
-import static org.lwjgl.opengl.GL30.GL_INVALID_FRAMEBUFFER_OPERATION;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
@@ -53,8 +46,10 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLUtil;
 
 import com.redmintie.game.util.graphics.Canvas;
+import com.sun.scenario.effect.impl.BufferUtil;
 
 public class Game {
 	private static String title = "Game";
@@ -62,7 +57,7 @@ public class Game {
 	private static int height = 512;
 	private static boolean resizable = true;
 	private static boolean fullscreen = false;
-	private static IntBuffer size = BufferUtils.createIntBuffer(1);
+	private static IntBuffer size;
 	
 	private static GLFWErrorCallback errorCallback;
 	@SuppressWarnings("unused")
@@ -81,11 +76,25 @@ public class Game {
 	private static Scene scene;
 	
 	public static void init() {
+		if (Flags.DEBUG) {
+			System.setProperty("org.lwjgl.util.Debug", "true");
+		}
+		if (Flags.LOG != null) {
+			try {
+				FileOutputStream file = new FileOutputStream(Flags.LOG);
+				System.setOut(new PrintStream(new DualOutputStream(System.out, file)));
+				System.setErr(new PrintStream(new DualOutputStream(System.err, file)));
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
 		glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint());
 		if (glfwInit() != GLFW_TRUE) {
 			throw new RuntimeException("Could not initialise GLFW.");
 		}
-		createWindow();
+		
+		size = BufferUtil.newIntBuffer(1);
 		createWindow();
 	}
 	private static void createWindow() {
@@ -127,6 +136,9 @@ public class Game {
 		glfwMakeContextCurrent(window);
 		if (old == NULL) {
 			GL.createCapabilities();
+			if (Flags.DEBUG) {
+				GLUtil.setupDebugMessageCallback();
+			}
 		}
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
@@ -186,7 +198,7 @@ public class Game {
 			}
 			
 			glfwSwapBuffers(window);
-			checkErrors();
+			GLUtil.checkGLError();
 		}
 		end();
 	}
@@ -202,36 +214,6 @@ public class Game {
 		}
 		Game.scene = scene;
 		scene.init();
-	}
-	public static void checkErrors() {
-		int error = glGetError();
-		if (error != GL_NO_ERROR) {
-			String str = "UNKNOWN ERROR";
-			switch (error) {
-			case GL_INVALID_ENUM:
-				str = "INVALID ENUM";
-				break;
-			case GL_INVALID_VALUE:
-				str = "INVALID VALUE";
-				break;
-			case GL_INVALID_OPERATION:
-				str = "INVALID OPERATION";
-				break;
-			case GL_INVALID_FRAMEBUFFER_OPERATION:
-				str = "INVALID FRAMEBUFFER OPERATION";
-				break;
-			case GL_OUT_OF_MEMORY:
-				str = "OUT OF MEMORY";
-				break;
-			case GL_STACK_UNDERFLOW:
-				str = "STACK UNDERFLOW";
-				break;
-			case GL_STACK_OVERFLOW:
-				str = "STACK OVERFLOW";
-				break;
-			}
-			throw new RuntimeException("OpenGL error: " + str + " (0x" + Integer.toHexString(error) + ")");
-		}
 	}
 	public static void end() {
 		ResourceManager.destroyResources();

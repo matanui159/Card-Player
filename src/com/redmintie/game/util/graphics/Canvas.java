@@ -9,6 +9,11 @@ import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotated;
+import static org.lwjgl.opengl.GL11.glScaled;
+import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import com.redmintie.game.util.Game;
@@ -36,6 +41,22 @@ public class Canvas {
 	public static void setTint(int red, int green, int blue) {
 		setTint(red, green, blue, 255);
 	}
-	
-	// TODO: matrix operations
+	public static void pushMatrix() {
+		glPushMatrix();
+	}
+	public static void popMatrix() {
+		glPopMatrix();
+	}
+	public static void resetMatrix() {
+		glLoadIdentity();
+	}
+	public static void translate(double x, double y) {
+		glTranslated(x, y, 0);
+	}
+	public static void rotate(double angle) {
+		glRotated(angle, 0, 0, 1);
+	}
+	public static void scale(double x, double y) {
+		glScaled(x, y, 0);
+	}
 }

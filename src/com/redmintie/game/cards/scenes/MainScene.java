@@ -14,7 +14,7 @@ public class MainScene extends Scene {
 	public MainScene() {
 		try {
 			test = new Sprite("res/images/cards/0.png");
-			font = new Font("res/test.ttf", 128);
+			font = new Font("res/font.ttf", 128);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			Game.end();

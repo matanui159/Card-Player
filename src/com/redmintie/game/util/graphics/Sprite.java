@@ -9,6 +9,8 @@ import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 import static org.lwjgl.stb.STBImageResize.stbir_resize_uint8;
+import static org.lwjgl.system.MathUtil.mathIsPoT;
+import static org.lwjgl.system.MathUtil.mathRoundPoT;
 import static org.lwjgl.system.jemalloc.JEmalloc.je_free;
 import static org.lwjgl.system.jemalloc.JEmalloc.je_malloc;
 
@@ -17,8 +19,8 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MathUtil;
 
+import com.redmintie.game.util.Flags;
 import com.redmintie.game.util.Resource;
 import com.redmintie.game.util.ResourceManager;
 
@@ -50,11 +52,17 @@ public class Sprite implements Resource {
 		int w = this.width;
 		int h = this.height;
 		boolean resized = false;
-		if (!GL.getCapabilities().GL_ARB_texture_non_power_of_two) {
-			if (!MathUtil.mathIsPoT(w) || !MathUtil.mathIsPoT(h)) {
-				w = MathUtil.mathRoundPoT(w);
-				h = MathUtil.mathRoundPoT(h);
+		if (!GL.getCapabilities().GL_ARB_texture_non_power_of_two || Flags.FORCE_PoT_TEXTURES) {
+			if (!mathIsPoT(w) || !mathIsPoT(h)) {
+				w = mathRoundPoT(w);
+				h = mathRoundPoT(h);
 				resized = true;
+				if (Flags.DEBUG) {
+					System.err.println("[SPRITE] NPoT textures are not supported. "
+							+ "Resizing \"" + path + "\" to " + w + "x" + h + ".");
+					System.err.println("[SPRITE]\tTexture may look fuzzy.");
+				}
+				
 				ByteBuffer d = je_malloc(w * h * 4);
 				
 				stbir_resize_uint8(data, this.width, this.height, 0, d, w, h, 0, 4);
