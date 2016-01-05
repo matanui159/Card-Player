@@ -19,6 +19,9 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import com.redmintie.game.util.Game;
 
 public class Canvas {
+	public static void init() {
+		resize();
+	}
 	public static void resize() {
 		int width = Game.getWidth();
 		int height = Game.getHeight();

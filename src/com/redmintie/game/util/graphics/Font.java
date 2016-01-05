@@ -7,17 +7,23 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.stb.STBTruetype.stbtt_BakeFontBitmap;
 import static org.lwjgl.stb.STBTruetype.stbtt_GetBakedQuad;
+import static org.lwjgl.stb.STBTruetype.stbtt_GetFontVMetrics;
+import static org.lwjgl.stb.STBTruetype.stbtt_InitFont;
+import static org.lwjgl.stb.STBTruetype.stbtt_ScaleForPixelHeight;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memAllocInt;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.stb.STBTTFontinfo;
 
 import com.redmintie.game.util.Resource;
 import com.redmintie.game.util.ResourceManager;
@@ -35,14 +41,36 @@ public class Font implements Resource {
 	
 	private STBTTBakedChar.Buffer chars = STBTTBakedChar.callocBuffer(CHARACTERS);
 	private int[] bitmaps = new int[CHARACTERS];
+	private double ascent;
+	private double descent;
+	private double linegap;
 	
-	public Font(String path, int size, int filter) throws IOException {
+	public Font(String path, double size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
-		ByteBuffer data = memAlloc(BITMAP_SIZE * BITMAP_SIZE);
 		
+		STBTTFontinfo info = STBTTFontinfo.malloc();
+		IntBuffer ascent = memAllocInt(1);
+		IntBuffer descent = memAllocInt(1);
+		IntBuffer linegap = memAllocInt(1);
+		
+		stbtt_InitFont(info, buffer);
+		float scale = stbtt_ScaleForPixelHeight(info, (float)size);
+		stbtt_GetFontVMetrics(info, ascent, descent, linegap);
+		this.ascent = ascent.get() * scale;
+		this.descent = descent.get() * scale;
+		this.linegap = linegap.get() * scale;
+		
+		info.free();
+		memFree(ascent);
+		memFree(descent);
+		memFree(linegap);
+		
+		ByteBuffer data = memAlloc(BITMAP_SIZE * BITMAP_SIZE);
 		int offset = 0;
 		int diff;
-		while ((diff = -stbtt_BakeFontBitmap(buffer, size, data, BITMAP_SIZE, BITMAP_SIZE, offset, chars)) > 0) {
+		
+		while ((diff = -stbtt_BakeFontBitmap(buffer, (float)size, data,
+				BITMAP_SIZE, BITMAP_SIZE, offset, chars)) > 0) {
 			Arrays.fill(bitmaps, offset, offset + diff, TextureUtil.createTexture(data, BITMAP_SIZE, BITMAP_SIZE,
 					GL_ALPHA, filter, GL_CLAMP_TO_EDGE));
 			offset += diff;
@@ -58,6 +86,20 @@ public class Font implements Resource {
 	}
 	public Font(String path, int size) throws IOException {
 		this(path, size, FILTER_LINEAR);
+	}
+	public double getFontAscent() {
+		return ascent;
+	}
+	public double getFontDescent() {
+		return descent;
+	}
+	public double getFontLinegap() {
+		return linegap;
+	}
+	public int getTextWidth(String text) {
+		// TODO: THIS
+		
+		return 0;
 	}
 	public void drawText(String text, double x, double y) {
 		xBuffer.put((float)x).flip();

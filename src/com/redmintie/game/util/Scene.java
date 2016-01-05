@@ -7,11 +7,15 @@ public class Scene {
 	}
 	public void draw() {
 	}
-	public void keyStateChanged(int key, boolean pressed) {
+	public void keyPressed(int key) {
+	}
+	public void keyReleased(int key) {
 	}
 	public void keyTyped(char cha) {
 	}
-	public void mouseButtonStateChanged(int button, boolean pressed) {
+	public void mouseButtonPressed(int button) {
+	}
+	public void mouseButtonReleased(int button) {
 	}
 	public void mouseMoved(double x, double y) {
 	}

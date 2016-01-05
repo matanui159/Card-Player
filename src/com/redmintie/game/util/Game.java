@@ -2,7 +2,7 @@ package com.redmintie.game.util;
 
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -12,7 +12,6 @@ import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
-import static org.lwjgl.glfw.GLFW.glfwGetVersionString;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
@@ -136,6 +135,7 @@ public class Game {
 			Callbacks.glfwReleaseCallbacks(old);
 			glfwDestroyWindow(old);
 		}
+		Input.setCursor(Input.getCursor());
 		Input.setCursorMode(Input.getCursorMode());
 		
 		glfwSetFramebufferSizeCallback(window, resizeCallback = new GLFWFramebufferSizeCallback() {
@@ -148,8 +148,15 @@ public class Game {
 		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
 			@Override
 			public void invoke(long window, int key, int scan, int action, int mods) {
-				if (action != GLFW_REPEAT && scene != null) {
-					scene.keyStateChanged(key, action == GLFW_PRESS);
+				if (scene != null) {
+					switch (action) {
+					case GLFW_PRESS:
+						scene.keyPressed(key);
+						break;
+					case GLFW_RELEASE:
+						scene.keyReleased(key);
+						break;
+					}
 				}
 			}
 		});
@@ -167,7 +174,14 @@ public class Game {
 			@Override
 			public void invoke(long window, int button, int action, int mods) {
 				if (scene != null) {
-					scene.mouseButtonStateChanged(button, action == GLFW_PRESS);
+					switch (action) {
+					case GLFW_PRESS:
+						scene.mouseButtonPressed(button);
+						break;
+					case GLFW_RELEASE:
+						scene.mouseButtonReleased(button);
+						break;
+					}
 				}
 			}
 		});
@@ -195,10 +209,9 @@ public class Game {
 			GL.createCapabilities();
 			if (Flags.DEBUG) {
 				GLUtil.setupDebugMessageCallback();
-				System.err.println("[VERSION]   GLFW: " + glfwGetVersionString());
-				System.err.println("[VERSION] OpenGL: " + glGetString(GL_VERSION) +
-						" (" + glGetString(GL_RENDERER) + ") by " + glGetString(GL_VENDOR));
-				System.err.println("[VERSION] OpenAL: " + "(TO IMPLEMENT)");
+				System.err.println("[OPENGL] OpenGL Renderer: " + glGetString(GL_RENDERER) + ".");
+				System.err.println("[OPENGL] OpenGL Version : " + glGetString(GL_VERSION) + ".");
+				System.err.println("[OPENGL] OpenGL Vendor  : " + glGetString(GL_VENDOR) + ".");
 			}
 		}
 		glEnable(GL_TEXTURE_2D);

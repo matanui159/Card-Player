@@ -11,8 +11,8 @@ public class Main {
 	public static void main(String[] args) {
 		setFlag("com.redmintie.DEBUG", "true");
 		setFlag("com.redmintie.LOG", "log.txt");
-		
 		Game.init();
+		Res.init();
 		
 		try {
 			Input.setCursor(new Cursor("res/cursor.png", 0, 0));

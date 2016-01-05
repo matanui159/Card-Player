@@ -18,7 +18,7 @@ import static org.lwjgl.opengl.GL11.glVertex2d;
 
 import java.nio.ByteBuffer;
 
-public class TextureUtil {
+class TextureUtil {
 	public static int createTexture(ByteBuffer data, int width, int height, int format, int filter, int wrap) {
 		int texture = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, texture);

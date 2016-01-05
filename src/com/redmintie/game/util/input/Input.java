@@ -10,12 +10,26 @@ import static org.lwjgl.glfw.GLFW.glfwGetKey;
 import static org.lwjgl.glfw.GLFW.glfwGetMouseButton;
 import static org.lwjgl.glfw.GLFW.glfwSetCursor;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.nio.DoubleBuffer;
 
 import org.lwjgl.BufferUtils;
 
 public class Input {
+	
+	public static final int MOUSE_BUTTON1 = 0;
+	public static final int MOUSE_BUTTON2 = 1;
+	public static final int MOUSE_BUTTON3 = 2;
+	public static final int MOUSE_BUTTON4 = 3;
+	public static final int MOUSE_BUTTON5 = 4;
+	public static final int MOUSE_BUTTON6 = 5;
+	public static final int MOUSE_BUTTON7 = 6;
+	public static final int MOUSE_BUTTON8 = 7;
+	public static final int MOUSE_BUTTON_LEFT = 0;
+	public static final int MOUSE_BUTTON_RIGHT = 1;
+	public static final int MOUSE_BUTTON_MIDDLE = 2;
+	
 	public static final int CURSOR_NORMAL = GLFW_CURSOR_NORMAL;
 	public static final int CURSOR_HIDDEN = GLFW_CURSOR_HIDDEN;
 	public static final int CURSOR_DISABLED = GLFW_CURSOR_DISABLED;
@@ -41,7 +55,12 @@ public class Input {
 		return pos.get();
 	}
 	public static void setCursor(Cursor cursor) {
-		glfwSetCursor(WindowAccess.getWindow(), (Input.cursor = cursor).getCursor());
+		Input.cursor = cursor;
+		if (cursor == null) {
+			glfwSetCursor(WindowAccess.getWindow(), NULL);
+		} else {
+			glfwSetCursor(WindowAccess.getWindow(), cursor.getCursor());
+		}
 	}
 	public static Cursor getCursor() {
 		return cursor;
