@@ -9,13 +9,13 @@ public class Scene {
 	}
 	public void keyStateChanged(int key, boolean pressed) {
 	}
-	public void keyTyped() {
+	public void keyTyped(char cha) {
 	}
-	public void mouseButtonChanged() {
+	public void mouseButtonStateChanged(int button, boolean pressed) {
 	}
-	public void mouseMoved() {
+	public void mouseMoved(double x, double y) {
 	}
-	public void mouseScrolled() {
+	public void mouseScrolled(double x, double y) {
 	}
 	public void end() {
 	}

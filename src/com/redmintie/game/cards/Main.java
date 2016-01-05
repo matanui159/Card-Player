@@ -1,7 +1,10 @@
 package com.redmintie.game.cards;
 
+import java.io.IOException;
+
 import com.redmintie.game.cards.scenes.MainScene;
 import com.redmintie.game.util.Game;
+import com.redmintie.game.util.input.Cursor;
 import com.redmintie.game.util.input.Input;
 
 public class Main {
@@ -11,8 +14,11 @@ public class Main {
 		
 		Game.init();
 		
-		Game.setFullscreen(true);
-		Input.setCursorMode(Input.CURSOR_DISABLED);
+		try {
+			Input.setCursor(new Cursor("res/cursor.png", 0, 0));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 		
 		Game.addScene("main", new MainScene());
 		Game.setScene("main");

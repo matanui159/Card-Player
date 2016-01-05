@@ -8,6 +8,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwGetKey;
 import static org.lwjgl.glfw.GLFW.glfwGetMouseButton;
+import static org.lwjgl.glfw.GLFW.glfwSetCursor;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 
 import java.nio.DoubleBuffer;
@@ -20,6 +21,7 @@ public class Input {
 	public static final int CURSOR_DISABLED = GLFW_CURSOR_DISABLED;
 	
 	private static DoubleBuffer pos = BufferUtils.createDoubleBuffer(1);
+	private static Cursor cursor;
 	private static int mode = CURSOR_NORMAL;
 	
 	public static boolean isKeyDown(int key) {
@@ -37,6 +39,12 @@ public class Input {
 		pos.rewind();
 		glfwGetCursorPos(WindowAccess.getWindow(), null, pos);
 		return pos.get();
+	}
+	public static void setCursor(Cursor cursor) {
+		glfwSetCursor(WindowAccess.getWindow(), (Input.cursor = cursor).getCursor());
+	}
+	public static Cursor getCursor() {
+		return cursor;
 	}
 	public static void setCursorMode(int mode) {
 		glfwSetInputMode(WindowAccess.getWindow(), GLFW_CURSOR, Input.mode = mode);

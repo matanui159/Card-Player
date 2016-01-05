@@ -12,13 +12,18 @@ import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static org.lwjgl.glfw.GLFW.glfwGetVersionString;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
@@ -28,10 +33,14 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_RENDERER;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_VENDOR;
+import static org.lwjgl.opengl.GL11.GL_VERSION;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.io.FileOutputStream;
@@ -42,13 +51,17 @@ import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.Callbacks;
+import org.lwjgl.glfw.GLFWCharCallback;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.Configuration;
 
 import com.redmintie.game.util.graphics.Canvas;
 import com.redmintie.game.util.input.Input;
@@ -67,9 +80,13 @@ public class Game {
 	@SuppressWarnings("unused")
 	private static GLFWKeyCallback keyCallback;
 	@SuppressWarnings("unused")
+	private static GLFWCharCallback keyTypedCallback;
+	@SuppressWarnings("unused")
 	private static GLFWMouseButtonCallback mouseCallback;
-	
-	//TODO: mouse move and scroll callbacks
+	@SuppressWarnings("unused")
+	private static GLFWCursorPosCallback mouseMoveCallback;
+	@SuppressWarnings("unused")
+	private static GLFWScrollCallback mouseScrollCallback;
 	
 	protected static long window = NULL;
 	private static boolean running;
@@ -78,12 +95,6 @@ public class Game {
 	private static Scene scene;
 	
 	public static void init() {
-		if (Flags.DEBUG) {
-			System.setProperty("org.lwjgl.util.Debug", "true");
-		}
-		if (Flags.TRACK_LEAKS) {
-			System.setProperty("org.lwjgl.util.DebugAllocator", "true");
-		}
 		if (Flags.LOG != null) {
 			try {
 				FileOutputStream file = new FileOutputStream(Flags.LOG);
@@ -92,6 +103,12 @@ public class Game {
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
+		}
+		if (Flags.TRACK_LEAKS) {
+			Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
+		}
+		if (Flags.DEBUG) {
+			Configuration.DEBUG.set(true);
 		}
 		
 		glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint());
@@ -122,12 +139,14 @@ public class Game {
 		Input.setCursorMode(Input.getCursorMode());
 		
 		glfwSetFramebufferSizeCallback(window, resizeCallback = new GLFWFramebufferSizeCallback() {
+			@Override
 			public void invoke(long window, int width, int height) {
 				Canvas.resize();
 			}
 		});
 		
 		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+			@Override
 			public void invoke(long window, int key, int scan, int action, int mods) {
 				if (action != GLFW_REPEAT && scene != null) {
 					scene.keyStateChanged(key, action == GLFW_PRESS);
@@ -135,15 +154,51 @@ public class Game {
 			}
 		});
 		
+		glfwSetCharCallback(window, keyTypedCallback = new GLFWCharCallback() {
+			@Override
+			public void invoke(long window, int codepoint) {
+				if (scene != null) {
+					scene.keyTyped((char)codepoint);
+				}
+			}
+		});
 		
-		// TODO: key types callback
-		// TODO: mouse callbacks
+		glfwSetMouseButtonCallback(window, mouseCallback = new GLFWMouseButtonCallback() {
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+				if (scene != null) {
+					scene.mouseButtonStateChanged(button, action == GLFW_PRESS);
+				}
+			}
+		});
+		
+		glfwSetCursorPosCallback(window, mouseMoveCallback = new GLFWCursorPosCallback() {
+			@Override
+			public void invoke(long window, double x, double y) {
+				if (scene != null) {
+					scene.mouseMoved(x, y);
+				}
+			}
+		});
+		
+		glfwSetScrollCallback(window, mouseScrollCallback = new GLFWScrollCallback() {
+			@Override
+			public void invoke(long window, double x, double y) {
+				if (scene != null) {
+					scene.mouseScrolled(x, y);
+				}
+			}
+		});
 		
 		glfwMakeContextCurrent(window);
 		if (old == NULL) {
 			GL.createCapabilities();
 			if (Flags.DEBUG) {
 				GLUtil.setupDebugMessageCallback();
+				System.err.println("[VERSION]   GLFW: " + glfwGetVersionString());
+				System.err.println("[VERSION] OpenGL: " + glGetString(GL_VERSION) +
+						" (" + glGetString(GL_RENDERER) + ") by " + glGetString(GL_VENDOR));
+				System.err.println("[VERSION] OpenAL: " + "(TO IMPLEMENT)");
 			}
 		}
 		glEnable(GL_TEXTURE_2D);

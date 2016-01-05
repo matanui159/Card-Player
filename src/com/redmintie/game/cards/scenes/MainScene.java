@@ -2,6 +2,8 @@ package com.redmintie.game.cards.scenes;
 
 import java.io.IOException;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.redmintie.game.util.Game;
 import com.redmintie.game.util.Scene;
 import com.redmintie.game.util.graphics.Canvas;
@@ -20,8 +22,10 @@ public class MainScene extends Scene {
 			Game.end();
 		}
 	}
-	public void init() {
-//		Input.setCursorMode(Input.CURSOR_DISABLED);
+	public void keyStateChanged(int key, boolean pressed) {
+		if (key == GLFW.GLFW_KEY_ESCAPE && pressed) {
+			Game.end();
+		}
 	}
 	public void draw() {
 		Canvas.clear(0, 0, 0);
