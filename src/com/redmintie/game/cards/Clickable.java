@@ -1,7 +1,6 @@
 package com.redmintie.game.cards;
 
 import com.redmintie.game.util.graphics.Canvas;
-import com.redmintie.game.util.input.Cursor;
 import com.redmintie.game.util.input.Input;
 
 public abstract class Clickable {
@@ -16,10 +15,8 @@ public abstract class Clickable {
 		int y = getY();
 		double cx = Input.getCursorX();
 		double cy = Input.getCursorY();
-		boolean hover = cx > x - width / 2 && cx < x + width / 2
+		return cx > x - width / 2 && cx < x + width / 2
 				&& cy > y - height / 2 && cy < y + height / 2;
-		Input.setCursor(hover ? Cursor.HAND : null);
-		return hover;
 	}
 	public void mouseButtonReleased(int button) {
 		if (button == Input.MOUSE_BUTTON1 && isHovering()) {

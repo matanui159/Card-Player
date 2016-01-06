@@ -36,9 +36,16 @@ public class ResourceManager {
 	public static void addResource(Resource resource) {
 		resources.add(resource);
 	}
+	public static void removeResource(Resource resource) {
+		resources.remove(resource);
+	}
 	public static void destroyResources() {
-		for (Resource resource : resources) {
-			resource.destroy();
+		int size = resources.size();
+		for (int i = 0; i < size; i++) {
+			resources.get(i).destroy();
+			int s = resources.size();
+			i -= (size - s);
+			size = s;
 		}
 		resources.clear();
 	}

@@ -37,7 +37,6 @@ public class Cursor implements Resource {
 	private int type;
 	private Cursor(int type) {
 		this.type = type;
-		ResourceManager.addResource(this);
 	}
 	public Cursor(String path, int xhot, int yhot) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
@@ -59,14 +58,14 @@ public class Cursor implements Resource {
 	long getCursor() {
 		if (cursor == NULL) {
 			cursor = glfwCreateStandardCursor(type);
+			ResourceManager.addResource(this);
 		}
 		return cursor;
 	}
 	@Override
 	public void destroy() {
-		if (cursor != NULL) {
-			glfwDestroyCursor(cursor);
-			cursor = NULL;
-		}
+		glfwDestroyCursor(cursor);
+		cursor = NULL;
+		ResourceManager.removeResource(this);
 	}
 }

@@ -129,5 +129,6 @@ public class Font implements Resource {
 			}
 		}
 		memFree(chars);
+		ResourceManager.removeResource(this);
 	}
 }

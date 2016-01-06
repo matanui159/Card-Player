@@ -98,5 +98,6 @@ public class Sprite implements Resource {
 	@Override
 	public void destroy() {
 		glDeleteTextures(texture);
+		ResourceManager.removeResource(this);
 	}
 }

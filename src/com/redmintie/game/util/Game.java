@@ -30,16 +30,6 @@ import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_RENDERER;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_VENDOR;
-import static org.lwjgl.opengl.GL11.GL_VERSION;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.io.FileOutputStream;
@@ -58,12 +48,11 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Configuration;
 
 import com.redmintie.game.util.graphics.Canvas;
 import com.redmintie.game.util.input.Input;
+import com.redmintie.game.util.sound.Sound;
 
 public class Game {
 	private static String title = "Game";
@@ -117,6 +106,7 @@ public class Game {
 		
 		size = BufferUtils.createIntBuffer(1);
 		createWindow();
+		Sound.init();
 	}
 	protected static void createWindow() {
 		glfwDefaultWindowHints();
@@ -206,17 +196,10 @@ public class Game {
 		
 		glfwMakeContextCurrent(window);
 		if (old == NULL) {
-			GL.createCapabilities();
-			if (Flags.DEBUG) {
-				GLUtil.setupDebugMessageCallback();
-				System.err.println("[OPENGL] OpenGL Renderer: " + glGetString(GL_RENDERER) + ".");
-				System.err.println("[OPENGL] OpenGL Version : " + glGetString(GL_VERSION) + ".");
-				System.err.println("[OPENGL] OpenGL Vendor  : " + glGetString(GL_VENDOR) + ".");
-			}
+			Canvas.init();
+		} else {
+			Canvas.reload();
 		}
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		if (running) {
 			glfwShowWindow(window);
@@ -259,24 +242,32 @@ public class Game {
 		running = true;
 		if (fullscreen) {
 			createWindow();
+		} else {
+			glfwShowWindow(window);
 		}
-		glfwShowWindow(window);
-		Canvas.resize();
-		
 		if (scene != null) {
 			scene.init();
 		}
 		
 		double last = glfwGetTime();
+		double min = Flags.FPS_LIMIT == 0 ? 0 : 1.0 / Flags.FPS_LIMIT;
 		while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+			double delta = glfwGetTime() - last;
+			while (min > 0 && delta < min) {
+				try {
+					Thread.sleep((int)Math.floor((min - delta) * 1000 + 0.5));
+				} catch (InterruptedException ex) {}
+				delta = glfwGetTime() - last;
+			}
+			last = glfwGetTime();
+			
 			glfwPollEvents();
 			
-			double time = glfwGetTime();
+			
 			if (scene != null) {
-				scene.update(time - last);
+				scene.update(delta);
 				scene.draw();
 			}
-			last = time;
 			
 			glfwSwapBuffers(window);
 		}
@@ -302,6 +293,7 @@ public class Game {
 			scene.end();
 		}
 		ResourceManager.destroyResources();
+		Sound.end();
 		
 		Callbacks.glfwReleaseCallbacks(window);
 		glfwDestroyWindow(window);
