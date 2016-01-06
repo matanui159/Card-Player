@@ -45,7 +45,7 @@ public class Cursor implements Resource {
 		ByteBuffer height = memByteBuffer(memAddress(image) + 4, 4);
 		ByteBuffer comp = memAlloc(4);
 		
-		ByteBuffer data = stbi_load_from_memory(buffer, buffer.limit(), image, height, comp, 4);
+		ByteBuffer data = stbi_load_from_memory(buffer, buffer.capacity(), image, height, comp, 4);
 		ResourceManager.freeBuffer(buffer);
 		memFree(comp);
 		

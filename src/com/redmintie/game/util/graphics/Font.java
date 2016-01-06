@@ -41,11 +41,11 @@ public class Font implements Resource {
 	
 	private STBTTBakedChar.Buffer chars = STBTTBakedChar.callocBuffer(CHARACTERS);
 	private int[] bitmaps = new int[CHARACTERS];
-	private double ascent;
-	private double descent;
-	private double linegap;
+	private int ascent;
+	private int descent;
+	private int linegap;
 	
-	public Font(String path, double size, int filter) throws IOException {
+	public Font(String path, int size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
 		
 		STBTTFontinfo info = STBTTFontinfo.malloc();
@@ -54,11 +54,11 @@ public class Font implements Resource {
 		IntBuffer linegap = memAllocInt(1);
 		
 		stbtt_InitFont(info, buffer);
-		float scale = stbtt_ScaleForPixelHeight(info, (float)size);
+		float scale = stbtt_ScaleForPixelHeight(info, size);
 		stbtt_GetFontVMetrics(info, ascent, descent, linegap);
-		this.ascent = ascent.get() * scale;
-		this.descent = descent.get() * scale;
-		this.linegap = linegap.get() * scale;
+		this.ascent = (int)(ascent.get() * scale);
+		this.descent = (int)(descent.get() * scale);
+		this.linegap = (int)(linegap.get() * scale);
 		
 		info.free();
 		memFree(ascent);
@@ -69,7 +69,7 @@ public class Font implements Resource {
 		int offset = 0;
 		int diff;
 		
-		while ((diff = -stbtt_BakeFontBitmap(buffer, (float)size, data,
+		while ((diff = -stbtt_BakeFontBitmap(buffer, size, data,
 				BITMAP_SIZE, BITMAP_SIZE, offset, chars)) > 0) {
 			Arrays.fill(bitmaps, offset, offset + diff, TextureUtil.createTexture(data, BITMAP_SIZE, BITMAP_SIZE,
 					GL_ALPHA, filter, GL_CLAMP_TO_EDGE));
@@ -87,19 +87,24 @@ public class Font implements Resource {
 	public Font(String path, int size) throws IOException {
 		this(path, size, FILTER_LINEAR);
 	}
-	public double getFontAscent() {
+	public int getFontAscent() {
 		return ascent;
 	}
-	public double getFontDescent() {
+	public int getFontDescent() {
 		return descent;
 	}
-	public double getFontLinegap() {
+	public int getFontLinegap() {
 		return linegap;
 	}
 	public int getTextWidth(String text) {
-		// TODO: THIS
-		
-		return 0;
+		int width = 0;
+		for (int i = 0; i < text.length(); i++) {
+			int c = text.charAt(i);
+			if (c < CHARACTERS) {
+				width += chars.get(c).xadvance();
+			}
+		}
+		return width;
 	}
 	public void drawText(String text, double x, double y) {
 		xBuffer.put((float)x).flip();

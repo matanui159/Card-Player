@@ -1,11 +1,7 @@
 package com.redmintie.game.cards;
 
-import java.io.IOException;
-
 import com.redmintie.game.cards.scenes.MainScene;
 import com.redmintie.game.util.Game;
-import com.redmintie.game.util.input.Cursor;
-import com.redmintie.game.util.input.Input;
 
 public class Main {
 	public static void main(String[] args) {
@@ -13,12 +9,6 @@ public class Main {
 		setFlag("com.redmintie.LOG", "log.txt");
 		Game.init();
 		Res.init();
-		
-		try {
-			Input.setCursor(new Cursor("res/cursor.png", 0, 0));
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
 		
 		Game.addScene("main", new MainScene());
 		Game.setScene("main");

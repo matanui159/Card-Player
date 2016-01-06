@@ -5,7 +5,7 @@ import com.redmintie.game.util.graphics.Canvas;
 public abstract class Button extends Clickable {	
 	private String text;
 	public Button(String text) {
-		super(Res.BUTTON.getWidth(), Res.BUTTON.getHeight());
+		super(Res.BUTTON_PRESSED.getWidth(), Res.BUTTON_PRESSED.getHeight());
 		this.text = text;
 	}
 	@Override
@@ -13,13 +13,14 @@ public abstract class Button extends Clickable {
 		super.draw();
 		
 		if (isItemPressed()) {
-			Canvas.translate(0, 4);
 			Res.BUTTON_PRESSED.draw(0, 0);
 		} else {
+			Canvas.translate(0, -4);
 			Res.BUTTON.draw(0, 0);
 		}
 		Canvas.setTint(0, 0, 0);
-		Res.FONT.drawText(text, 0, Res.FONT.getFontAscent());
+		Res.FONT.drawText(text, Res.BUTTON.getWidth() / 2 - Res.FONT.getTextWidth(text) / 2,
+				Res.FONT.getFontAscent());
 		Canvas.setTint(255, 255, 255);
 		
 		Canvas.popMatrix();
