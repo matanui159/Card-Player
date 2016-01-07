@@ -174,6 +174,9 @@ public class WavCodec implements Codec {
 		}
 		
 		buffer.position(buffer.position() + (size - 16));
+		if (buffer.position() % 2 == 1) {
+			buffer.position(buffer.position() + 1);
+		}
 		lookForChunk(buffer, DATA);
 		size = buffer.getInt();
 		int samples = size / (sampleSize / 8);
