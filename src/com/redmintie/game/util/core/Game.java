@@ -1,4 +1,4 @@
-package com.redmintie.game.util;
+package com.redmintie.game.util.core;
 
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
@@ -48,8 +48,10 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.openal.ALUtil;
 import org.lwjgl.system.Configuration;
 
+import com.redmintie.game.util.DualOutputStream;
 import com.redmintie.game.util.graphics.Canvas;
 import com.redmintie.game.util.input.Input;
 import com.redmintie.game.util.sound.Sound;
@@ -120,6 +122,9 @@ public class Game {
 			window = glfwCreateWindow(mode.width(), mode.height(), title, monitor, old);
 		} else {
 			window = glfwCreateWindow(width, height, title, NULL, old);
+		}
+		if (window == NULL) {
+			throw new RuntimeException("Could not create window.");
 		}
 		if (old != NULL) {
 			Callbacks.glfwReleaseCallbacks(old);
@@ -254,6 +259,7 @@ public class Game {
 		while (glfwWindowShouldClose(window) == GLFW_FALSE) {
 			double delta = glfwGetTime() - last;
 			while (min > 0 && delta < min) {
+				
 				try {
 					Thread.sleep((int)Math.floor((min - delta) * 1000 + 0.5));
 				} catch (InterruptedException ex) {}
@@ -270,6 +276,7 @@ public class Game {
 			}
 			
 			glfwSwapBuffers(window);
+			ALUtil.checkALError();
 		}
 		end();
 	}

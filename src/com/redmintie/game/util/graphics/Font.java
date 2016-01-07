@@ -1,6 +1,5 @@
 package com.redmintie.game.util.graphics;
 
-import static org.lwjgl.opengl.GL11.GL_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
@@ -25,8 +24,8 @@ import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTTFontinfo;
 
-import com.redmintie.game.util.Resource;
-import com.redmintie.game.util.ResourceManager;
+import com.redmintie.game.util.core.Resource;
+import com.redmintie.game.util.core.ResourceManager;
 
 public class Font implements Resource {
 	public static final int FILTER_NEAREST = GL_NEAREST;
@@ -66,26 +65,36 @@ public class Font implements Resource {
 		memFree(linegap);
 		
 		ByteBuffer data = memAlloc(BITMAP_SIZE * BITMAP_SIZE);
+		ByteBuffer rgba = memAlloc(BITMAP_SIZE * BITMAP_SIZE * 4);
 		int offset = 0;
 		int diff;
 		
 		while ((diff = -stbtt_BakeFontBitmap(buffer, size, data,
 				BITMAP_SIZE, BITMAP_SIZE, offset, chars)) > 0) {
-			Arrays.fill(bitmaps, offset, offset + diff, TextureUtil.createTexture(data, BITMAP_SIZE, BITMAP_SIZE,
-					GL_ALPHA, filter, GL_CLAMP_TO_EDGE));
+			Arrays.fill(bitmaps, offset, offset + diff, getBitmap(data, rgba, filter));
 			offset += diff;
 			chars.position(offset);
 		}
-		Arrays.fill(bitmaps, offset, CHARACTERS, TextureUtil.createTexture(data, BITMAP_SIZE, BITMAP_SIZE,
-				GL_ALPHA, filter, GL_CLAMP_TO_EDGE));
+		Arrays.fill(bitmaps, offset, CHARACTERS, getBitmap(data, rgba, filter));
 		chars.rewind();
 		
 		ResourceManager.freeBuffer(buffer);
 		memFree(data);
+		memFree(rgba);
 		ResourceManager.addResource(this);
 	}
 	public Font(String path, int size) throws IOException {
 		this(path, size, FILTER_LINEAR);
+	}
+	private int getBitmap(ByteBuffer data, ByteBuffer rgba, int filter) {
+		for (int i = 0; i < BITMAP_SIZE * BITMAP_SIZE; i++) {
+			rgba.put(i * 4, (byte)0xFF);
+			rgba.put(i * 4 + 1, (byte)0xFF);
+			rgba.put(i * 4 + 2, (byte)0xFF);
+			rgba.put(i * 4 + 3, data.get(i));
+		}
+		
+		return TextureUtil.createTexture(rgba, BITMAP_SIZE, BITMAP_SIZE, filter, GL_CLAMP_TO_EDGE);
 	}
 	public int getFontAscent() {
 		return ascent;

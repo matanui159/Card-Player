@@ -1,7 +1,7 @@
 package com.redmintie.game.cards;
 
 import com.redmintie.game.cards.scenes.MainScene;
-import com.redmintie.game.util.Game;
+import com.redmintie.game.util.core.Game;
 
 public class Main {
 	public static void main(String[] args) {

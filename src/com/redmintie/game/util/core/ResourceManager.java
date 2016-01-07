@@ -1,4 +1,4 @@
-package com.redmintie.game.util;
+package com.redmintie.game.util.core;
 
 import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;

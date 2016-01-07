@@ -22,8 +22,8 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.glfw.GLFWImage;
 
-import com.redmintie.game.util.Resource;
-import com.redmintie.game.util.ResourceManager;
+import com.redmintie.game.util.core.Resource;
+import com.redmintie.game.util.core.ResourceManager;
 
 public class Cursor implements Resource {
 	public static final Cursor ARROW = new Cursor(GLFW_ARROW_CURSOR);

@@ -1,10 +1,13 @@
 package com.redmintie.game.cards.scenes;
 
+import java.io.IOException;
+
 import com.redmintie.game.cards.Button;
 import com.redmintie.game.cards.Res;
-import com.redmintie.game.util.Game;
-import com.redmintie.game.util.Scene;
+import com.redmintie.game.util.core.Game;
+import com.redmintie.game.util.core.Scene;
 import com.redmintie.game.util.graphics.Canvas;
+import com.redmintie.game.util.sound.Sound;
 
 public class MainScene extends Scene {
 	private Button host = new Button("HOST") {
@@ -32,6 +35,15 @@ public class MainScene extends Scene {
 	private int frames;
 	private double time;
 	private int fps;
+	
+	public void init() {
+		try {
+			new Sound("res/sounds/junk.wav").play();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void update(double delta) {
 		frames++;

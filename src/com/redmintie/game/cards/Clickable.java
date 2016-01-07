@@ -6,6 +6,7 @@ import com.redmintie.game.util.input.Input;
 public abstract class Clickable {
 	private int width;
 	private int height;
+	private boolean last;
 	public Clickable(int width, int height) {
 		this.width = width;
 		this.height = height;
@@ -20,11 +21,16 @@ public abstract class Clickable {
 	}
 	public void mouseButtonReleased(int button) {
 		if (button == Input.MOUSE_BUTTON1 && isHovering()) {
+			Res.RELEASE_SOUND.play();
 			itemClicked();
 		}
 	}
 	public boolean isItemPressed() {
-		return isHovering() && Input.isMouseButtonDown(Input.MOUSE_BUTTON1);
+		boolean pressed = isHovering() && Input.isMouseButtonDown(Input.MOUSE_BUTTON1);
+		if (pressed && !last) {
+			Res.PRESS_SOUND.play();
+		}
+		return last = pressed;
 	}
 	public void draw() {
 		Canvas.pushMatrix();

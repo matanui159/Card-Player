@@ -1,4 +1,4 @@
-package com.redmintie.game.util;
+package com.redmintie.game.util.core;
 
 public interface Resource {
 	public void destroy();

@@ -2,6 +2,7 @@ package com.redmintie.game.util.sound;
 
 import static org.lwjgl.openal.AL10.AL_BUFFER;
 import static org.lwjgl.openal.AL10.AL_DISTANCE_MODEL;
+import static org.lwjgl.openal.AL10.AL_EXTENSIONS;
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
 import static org.lwjgl.openal.AL10.AL_INVERSE_DISTANCE;
@@ -19,6 +20,7 @@ import static org.lwjgl.openal.AL10.alEnable;
 import static org.lwjgl.openal.AL10.alGenBuffers;
 import static org.lwjgl.openal.AL10.alGenSources;
 import static org.lwjgl.openal.AL10.alGetSourcei;
+import static org.lwjgl.openal.AL10.alGetString;
 import static org.lwjgl.openal.AL10.alSourcePause;
 import static org.lwjgl.openal.AL10.alSourcePlay;
 import static org.lwjgl.openal.AL10.alSourceStop;
@@ -34,10 +36,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.openal.ALContext;
-import org.lwjgl.openal.ALUtil;
 
-import com.redmintie.game.util.Resource;
-import com.redmintie.game.util.ResourceManager;
+import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Resource;
+import com.redmintie.game.util.core.ResourceManager;
 import com.redmintie.game.util.sound.codec.Codec;
 import com.redmintie.game.util.sound.codec.WavCodec;
 
@@ -57,6 +59,11 @@ public class Sound implements Resource {
 			throw new RuntimeException("Could not initialise OpenAL.");
 		}
 		context.makeCurrent();
+		if (Flags.DEBUG) {
+			System.err.println("[OPENAL] Supported Extensions:\n[OPENAL]\t"
+					+ alGetString(AL_EXTENSIONS).replace(" ", "\n[OPENAL]\t"));
+		}
+		
 		alEnable(AL_SOURCE_DISTANCE_MODEL);
 	}
 	public static void end() {
@@ -74,12 +81,12 @@ public class Sound implements Resource {
 	private double maxDist = Float.MAX_VALUE;
 	private double rolloff = 1;
 	
-	public Sound(String path) throws IOException {
+	public Sound(String path, double volume) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
 		
 		Codec codec = null;
 		if (WavCodec.checkHeader(buffer)) {
-			codec = new WavCodec(buffer);
+			codec = new WavCodec(buffer, volume);
 		} else {
 			throw new IOException("Unsupported file format.");
 		}
@@ -87,14 +94,14 @@ public class Sound implements Resource {
 		
 		this.buffer = alGenBuffers();
 		alBufferData(this.buffer, codec.getFormat(), codec.getData(), codec.getFrequency());
-		ALUtil.checkALError();
 		codec.destroy();
 		
 		source = alGenSources();
 		alSourcei(source, AL_BUFFER, this.buffer);
-		
-		ALUtil.checkALError();
 		ResourceManager.addResource(this);
+	}
+	public Sound(String path) throws IOException {
+		this(path, 1);
 	}
 	public void setVolume(double volume) {
 		alSourcef(source, AL_GAIN, (float)(this.volume = volume));

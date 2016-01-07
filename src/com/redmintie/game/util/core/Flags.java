@@ -1,4 +1,4 @@
-package com.redmintie.game.util;
+package com.redmintie.game.util.core;
 
 public class Flags {
 	public static final boolean DEBUG = Boolean.getBoolean("com.redmintie.DEBUG");

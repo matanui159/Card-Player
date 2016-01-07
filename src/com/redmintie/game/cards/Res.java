@@ -10,15 +10,17 @@ public class Res {
 	public static Sprite BUTTON;
 	public static Sprite BUTTON_PRESSED;
 	public static Font FONT;
-	public static Sound BUTTON_PRESS_SOUND;
-	public static Sound BUTTON_RELEASE_SOUND;
+	
+	public static Sound PRESS_SOUND;
+	public static Sound RELEASE_SOUND;
+	
 	public static void init() {
 		try {
 			BUTTON = new Sprite("res/images/ui/button/normal.png");
 			BUTTON_PRESSED = new Sprite("res/images/ui/button/pressed.png");
 			FONT = new Font("res/font.ttf", BUTTON_PRESSED.getHeight());
-			BUTTON_PRESS_SOUND = new Sound("res/sounds/button/press.wav");
-			BUTTON_RELEASE_SOUND = new Sound("res/sounds/button/release.wav");
+			PRESS_SOUND = new Sound("res/sounds/button/press.wav", 10);
+			RELEASE_SOUND = new Sound("res/sounds/button/release.wav", 10);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

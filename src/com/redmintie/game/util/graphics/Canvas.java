@@ -29,8 +29,8 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
 
-import com.redmintie.game.util.Flags;
-import com.redmintie.game.util.Game;
+import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Game;
 
 public class Canvas {
 	public static void init() {

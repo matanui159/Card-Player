@@ -3,7 +3,6 @@ package com.redmintie.game.util.graphics;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
@@ -21,9 +20,9 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL;
 
-import com.redmintie.game.util.Flags;
-import com.redmintie.game.util.Resource;
-import com.redmintie.game.util.ResourceManager;
+import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Resource;
+import com.redmintie.game.util.core.ResourceManager;
 
 public class Sprite implements Resource {
 	public static final int FILTER_NEAREST = GL_NEAREST;
@@ -72,7 +71,7 @@ public class Sprite implements Resource {
 			}
 		}
 		
-		texture = TextureUtil.createTexture(data, w, h, GL_RGBA, filter, wrap);
+		texture = TextureUtil.createTexture(data, w, h, filter, wrap);
 		if (resized) {
 			memFree(data);
 		} else {
