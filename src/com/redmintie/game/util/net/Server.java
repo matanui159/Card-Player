@@ -20,7 +20,7 @@ import org.lwjgl.BufferUtils;
 public abstract class Server {
 	private ServerSocketChannel channel;
 	private Selector selector;
-	private ArrayList<Client> clients = new ArrayList<Client>();
+	ArrayList<Client> clients = new ArrayList<Client>();
 	
 	private ByteBuffer output = BufferUtils.createByteBuffer(65535).order(ByteOrder.BIG_ENDIAN);
 	
@@ -43,7 +43,7 @@ public abstract class Server {
 			for (SelectionKey key : keys) {
 				if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
 					SocketChannel socket = ((ServerSocketChannel)key.channel()).accept();
-					Client client = new ClientConnection(socket);
+					Client client = new ClientConnection(this, socket);
 					socket.register(selector, SelectionKey.OP_READ, socket);
 					clients.add(client);
 				}
@@ -94,8 +94,8 @@ public abstract class Server {
 	public abstract void dataRecieved(Client client, ByteBuffer data);
 	
 	private class ClientConnection extends Client {
-		public ClientConnection(SocketChannel channel) throws IOException {
-			super(channel);
+		public ClientConnection(Server server, SocketChannel channel) throws IOException {
+			super(server, channel);
 		}
 		public void clientConnected() {
 		}

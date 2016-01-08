@@ -2,6 +2,7 @@ package com.redmintie.game.cards;
 
 import java.io.IOException;
 
+import com.redmintie.game.util.core.Game;
 import com.redmintie.game.util.graphics.Font;
 import com.redmintie.game.util.graphics.Sprite;
 import com.redmintie.game.util.sound.Sound;
@@ -23,6 +24,7 @@ public class Res {
 			RELEASE_SOUND = new Sound("res/sounds/button/release.wav", 10);
 		} catch (IOException ex) {
 			ex.printStackTrace();
+			Game.end();
 		}
 	}
 }

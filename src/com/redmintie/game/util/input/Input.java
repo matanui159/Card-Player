@@ -169,14 +169,12 @@ public class Input {
 		return glfwGetMouseButton(WindowAccess.getWindow(), button) == GLFW_PRESS;
 	}
 	public static double getCursorX() {
-		pos.rewind();
 		glfwGetCursorPos(WindowAccess.getWindow(), pos, null);
-		return pos.get();
+		return pos.get(0);
 	}
 	public static double getCursorY() {
-		pos.rewind();
 		glfwGetCursorPos(WindowAccess.getWindow(), null, pos);
-		return pos.get();
+		return pos.get(0);
 	}
 	public static void setCursor(Cursor cursor) {
 		Input.cursor = cursor;

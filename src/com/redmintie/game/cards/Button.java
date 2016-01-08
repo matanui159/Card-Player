@@ -25,7 +25,4 @@ public abstract class Button extends Clickable {
 		
 		Canvas.popMatrix();
 	}
-	@Override
-	public void itemClicked() {
-	}
 }

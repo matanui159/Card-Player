@@ -24,6 +24,7 @@ import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTTFontinfo;
 
+import com.redmintie.game.util.core.Game;
 import com.redmintie.game.util.core.Resource;
 import com.redmintie.game.util.core.ResourceManager;
 
@@ -46,6 +47,7 @@ public class Font implements Resource {
 	
 	public Font(String path, int size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
+		size *= Game.getScaleFactor();
 		
 		STBTTFontinfo info = STBTTFontinfo.malloc();
 		IntBuffer ascent = memAllocInt(1);

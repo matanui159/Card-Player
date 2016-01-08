@@ -13,6 +13,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -79,6 +80,7 @@ public class Game {
 	private static GLFWScrollCallback mouseScrollCallback;
 	
 	protected static long window = NULL;
+	private static int scale;
 	private static boolean running;
 	
 	private static HashMap<String, Scene> scenes = new HashMap<String, Scene>();
@@ -126,7 +128,15 @@ public class Game {
 		if (window == NULL) {
 			throw new RuntimeException("Could not create window.");
 		}
-		if (old != NULL) {
+		if (old == NULL) {
+			glfwGetWindowSize(window, size, null);
+			int width = size.get(0);
+			glfwGetFramebufferSize(window, size, null);
+			scale = size.get(0) / width;
+			if (Flags.DEBUG) {
+				System.err.println("[WINDOW] Scale Factor: " + scale);
+			}
+		} else {
 			Callbacks.glfwReleaseCallbacks(old);
 			glfwDestroyWindow(old);
 		}
@@ -220,14 +230,15 @@ public class Game {
 		glfwSetWindowSize(window, Game.width = width, Game.height = height);
 	}
 	public static int getWidth() {
-		size.rewind();
-		glfwGetFramebufferSize(window, size, null);
-		return size.get();
+		glfwGetWindowSize(window, size, null);
+		return size.get(0);
 	}
 	public static int getHeight() {
-		size.rewind();
-		glfwGetFramebufferSize(window, null, size);
-		return size.get();
+		glfwGetWindowSize(window, null, size);
+		return size.get(0);
+	}
+	public static int getScaleFactor() {
+		return scale;
 	}
 	public static void setResizable(boolean resizable) {
 		Game.resizable = resizable;

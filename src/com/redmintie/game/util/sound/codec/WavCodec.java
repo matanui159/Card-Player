@@ -10,6 +10,7 @@ import static org.lwjgl.openal.EXTFloat32.AL_FORMAT_MONO_FLOAT32;
 import static org.lwjgl.openal.EXTFloat32.AL_FORMAT_STEREO_FLOAT32;
 import static org.lwjgl.openal.EXTMulaw.AL_FORMAT_MONO_MULAW_EXT;
 import static org.lwjgl.openal.EXTMulaw.AL_FORMAT_STEREO_MULAW_EXT;
+import static org.lwjgl.system.MathUtil.mathRoundPoT;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
@@ -49,7 +50,6 @@ public class WavCodec implements Codec {
 				| (buffer.get(pos + 2) << 8) | buffer.get(pos + 3);
 	}
 	private static void lookForChunk(ByteBuffer buffer, int name) {
-		log("Looking for chunk: 0x" + Integer.toHexString(name).toUpperCase() + ".");
 		int pos = buffer.position();
 		while (readBigEndianInt(buffer, pos) != name) {
 			pos += 8;
@@ -79,22 +79,24 @@ public class WavCodec implements Codec {
 	public WavCodec(ByteBuffer buffer, double volume) throws IOException {
 		log("Reading Wav File.");
 		
-		if (readBigEndianInt(buffer, 0) == RIFF) {
+		int head = readBigEndianInt(buffer, 0);
+		if (head == RIFF) {
 			log("Byte Order: LITTLE ENDIAN.");
 			buffer.order(ByteOrder.LITTLE_ENDIAN);
-		} else {
+		} else if (head == RIFX) {
 			log("Byte Order: BIG ENDIAN.");
 			buffer.order(ByteOrder.BIG_ENDIAN);
 		}
 		buffer.position(12);
 		
+		log("Looking for 'fmt ' chunk.");
 		lookForChunk(buffer, FMT);
 		int size = buffer.getInt();
 		int type = buffer.getShort();
 		int channels = buffer.getShort();
 		freq = buffer.getInt();
 		buffer.position(buffer.position() + 6);
-		int sampleSize = (int)Math.ceil(buffer.getShort() / 8.0) * 8;
+		int sampleSize = mathRoundPoT((int)Math.ceil(buffer.getShort() / 8.0)) * 8;
 		log("Channels: " + channels + ".");
 		log("Sample Size: " + sampleSize + ".");
 		log("Frequency: " + freq + ".");
@@ -144,14 +146,14 @@ public class WavCodec implements Codec {
 		} else if (type == TYPE_ALAW) {
 			if (channels == 1) {
 				if (sampleSize == 8) {
-					log("Format: MONO A-LAW");
+					log("Format: MONO A-LAW.");
 					format = AL_FORMAT_MONO_ALAW_EXT;
 				} else {
 					unsupportedAudio();
 				}
 			} else if (channels == 2) {
 				if (sampleSize == 8) {
-					log("Format: STEREO A-LAW");
+					log("Format: STEREO A-LAW.");
 					format = AL_FORMAT_STEREO_ALAW_EXT;
 				} else {
 					unsupportedAudio();
@@ -161,10 +163,10 @@ public class WavCodec implements Codec {
 			}
 		} else if (type == TYPE_MULAW) {
 			if (channels == 1) {
-				log("Format: MONO MU-LAW");
+				log("Format: MONO \u03BC-LAW.");
 				format = AL_FORMAT_MONO_MULAW_EXT;
 			} else if (channels == 2) {
-				log("Format: STEREO MU-LAW");
+				log("Format: STEREO \u03BC-LAW.");
 				format = AL_FORMAT_STEREO_MULAW_EXT;
 			} else {
 				unsupportedAudio();
@@ -177,6 +179,7 @@ public class WavCodec implements Codec {
 		if (buffer.position() % 2 == 1) {
 			buffer.position(buffer.position() + 1);
 		}
+		log("Looking for 'data' chunk.");
 		lookForChunk(buffer, DATA);
 		size = buffer.getInt();
 		int samples = size / (sampleSize / 8);

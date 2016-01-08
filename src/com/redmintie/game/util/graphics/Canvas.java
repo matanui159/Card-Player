@@ -23,6 +23,7 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotated;
 import static org.lwjgl.opengl.GL11.glScaled;
+import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glViewport;
 
@@ -59,6 +60,7 @@ public class Canvas {
 			glLoadIdentity();
 			glOrtho(0, width, height, 0, 1, -1);
 			glMatrixMode(GL_MODELVIEW);
+			resetMatrix();
 		}
 	}
 	public static void clear(int red, int green, int blue) {
@@ -79,6 +81,7 @@ public class Canvas {
 	}
 	public static void resetMatrix() {
 		glLoadIdentity();
+		glScalef(Game.getScaleFactor(), Game.getScaleFactor(), 0);
 	}
 	public static void translate(double x, double y) {
 		glTranslated(x, y, 0);

@@ -15,6 +15,7 @@ import java.nio.channels.SocketChannel;
 import org.lwjgl.BufferUtils;
 
 public abstract class Client {
+	private Server server;
 	SocketChannel channel;
 	private Selector selector;
 	private SelectionKey key;
@@ -32,7 +33,8 @@ public abstract class Client {
 		key = channel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ);
 		channel.connect(new InetSocketAddress(InetAddress.getByName(address), port));
 	}
-	Client(SocketChannel channel) throws IOException {
+	Client(Server server, SocketChannel channel) throws IOException {
+		this.server = server;
 		this.channel = channel;
 		channel.configureBlocking(false);
 	}
@@ -72,7 +74,7 @@ public abstract class Client {
 			if ((key.readyOps() & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
 				channel.finishConnect();
 			}
-			if ((key.readyOps() & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
+			if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
 				ByteBuffer data = read();
 				if (data != null) {
 					dataRecieved(data);
@@ -82,7 +84,6 @@ public abstract class Client {
 					channel.close();
 					selector.close();
 					clientDisconnected();
-					return;
 				}
 			}
 		}
@@ -103,7 +104,11 @@ public abstract class Client {
 	public void close() throws IOException {
 		send(0);
 		channel.close();
-		selector.close();
+		if (server == null) {
+			selector.close();
+		} else {
+			server.clients.remove(this);
+		}
 	}
 	
 	public abstract void clientConnected();
