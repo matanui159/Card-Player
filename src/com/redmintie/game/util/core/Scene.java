@@ -7,7 +7,7 @@ public class Scene {
 	}
 	public void draw() {
 	}
-	public void keyPressed(int key) {
+	public void keyPressed(int key, boolean repeat) {
 	}
 	public void keyReleased(int key) {
 	}

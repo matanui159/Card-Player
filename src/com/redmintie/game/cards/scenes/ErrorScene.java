@@ -1,51 +1,45 @@
-//package com.redmintie.game.cards.scenes;
-//
-//import com.redmintie.game.cards.Res;
-//import com.redmintie.game.cards.StandardButton;
-//import com.redmintie.steelplate.core.Game;
-//import com.redmintie.steelplate.entity.ui.Scene;
-//import com.redmintie.steelplate.render.Canvas;
-//import com.redmintie.steelplate.render.Color;
-//
-//public class ErrorScene extends Scene {
-//	private StandardButton done = new StandardButton("Done") {
-//		@Override
-//		public void update(double delta) {
-//			super.update(delta);
-//			position.set(
-//					Game.getGameInstance().getWidth() - width - 10,
-//					Game.getGameInstance().getHeight() - height - 10
-//			);
-//		}
-//		@Override
-//		public void buttonPressed() {
-//			super.buttonPressed();
-//			getView().setScene(new MainScene());
-//		}
-//	};
-//	private String error;
-//	public ErrorScene(String error) {
-//		this.error = error;
-//	}
-//	public ErrorScene(Exception ex) {
-//		error = ex.toString();
-//	}
-//	@Override
-//	public void init() {
-//	}
-//	@Override
-//	public void update(double delta) {
-//		done.update(delta);
-//	}
-//	@Override
-//	public void draw(Canvas canvas) {
-//		canvas.setColor(Color.WHITE);
-//		canvas.drawText(error,
-//				Game.getGameInstance().getWidth() / 2 - Res.FONT.getTextWidth(error) / 2,
-//				Game.getGameInstance().getHeight() / 2 - Res.FONT.getTextHeight(error) / 2);
-//		done.draw(canvas);
-//	}
-//	@Override
-//	public void end() {
-//	}
-//}
+package com.redmintie.game.cards.scenes;
+
+import com.redmintie.game.cards.Button;
+import com.redmintie.game.cards.Res;
+import com.redmintie.game.util.core.Game;
+
+public class ErrorScene extends StandardScene {
+	private Button ok = new Button("OK") {
+		@Override
+		public int getX() {
+			return Game.getWidth() - Res.BUTTON.getWidth() / 2 - 10;
+		}
+		@Override
+		public int getY() {
+			return Game.getHeight() - Res.BUTTON.getHeight() / 2 - 10;
+		}
+		@Override
+		public void itemClicked() {
+			Game.setScene(new MainScene());
+		}
+	};
+	
+	private String error;
+	public ErrorScene(String error) {
+		this.error = error;
+	}
+	public ErrorScene(Exception ex) {
+		ex.printStackTrace();
+		error = ex.getMessage() == null ? "UNKNOWN ERROR" : ex.getMessage();
+	}
+	@Override
+	public void draw() {
+		super.draw();
+		
+		Res.SMALL_FONT.drawText(error, Game.getWidth() / 2 - Res.SMALL_FONT.getTextWidth(error) / 2,
+				Game.getHeight() / 2 - Res.SMALL_FONT.getFontHeight() / 2 + Res.SMALL_FONT.getFontAscent());
+		ok.draw();
+		
+		postDraw();
+	}
+	@Override
+	public void mouseButtonReleased(int button) {
+		ok.mouseButtonReleased(button);
+	}
+}

@@ -3,6 +3,7 @@ package com.redmintie.game.util.core;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -28,7 +29,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -37,7 +37,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.IntBuffer;
-import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.Callbacks;
@@ -82,8 +81,6 @@ public class Game {
 	protected static long window = NULL;
 	private static int scale;
 	private static boolean running;
-	
-	private static HashMap<String, Scene> scenes = new HashMap<String, Scene>();
 	private static Scene scene;
 	
 	public static void init() {
@@ -154,13 +151,10 @@ public class Game {
 			@Override
 			public void invoke(long window, int key, int scan, int action, int mods) {
 				if (scene != null) {
-					switch (action) {
-					case GLFW_PRESS:
-						scene.keyPressed(key);
-						break;
-					case GLFW_RELEASE:
+					if (action == GLFW_RELEASE) {
 						scene.keyReleased(key);
-						break;
+					} else {
+						scene.keyPressed(key, action == GLFW_REPEAT);
 					}
 				}
 			}
@@ -291,12 +285,6 @@ public class Game {
 		}
 		end();
 	}
-	public static void addScene(String name, Scene scene) {
-		scenes.put(name, scene);
-	}
-	public static void setScene(String scene) {
-		setScene(scenes.get(scene));
-	}
 	public static void setScene(Scene scene) {
 		if (running && Game.scene != null) {
 			Game.scene.end();
@@ -305,6 +293,9 @@ public class Game {
 		if (running) {
 			scene.init();
 		}
+	}
+	public static Scene getScene() {
+		return scene;
 	}
 	public static void end() {
 		if (scene != null) {
@@ -315,7 +306,6 @@ public class Game {
 		
 		Callbacks.glfwReleaseCallbacks(window);
 		glfwDestroyWindow(window);
-		glfwTerminate();
 		errorCallback.release();
 		
 		System.exit(0);

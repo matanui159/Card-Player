@@ -58,7 +58,7 @@ public class Font implements Resource {
 		float scale = stbtt_ScaleForPixelHeight(info, size);
 		stbtt_GetFontVMetrics(info, ascent, descent, linegap);
 		this.ascent = (int)(ascent.get() * scale);
-		this.descent = (int)(descent.get() * scale);
+		this.descent = -(int)(descent.get() * scale);
 		this.linegap = (int)(linegap.get() * scale);
 		
 		info.free();
@@ -103,6 +103,9 @@ public class Font implements Resource {
 	}
 	public int getFontDescent() {
 		return descent;
+	}
+	public int getFontHeight() {
+		return ascent + descent;
 	}
 	public int getFontLinegap() {
 		return linegap;

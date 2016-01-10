@@ -10,8 +10,7 @@ public class Main {
 		Game.init();
 		Res.init();
 		
-		Game.addScene("main", new MainScene());
-		Game.setScene("main");
+		Game.setScene(new MainScene());
 		
 		Game.start();
 	}

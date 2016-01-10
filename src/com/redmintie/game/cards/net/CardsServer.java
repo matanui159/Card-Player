@@ -27,9 +27,13 @@ public class CardsServer extends Server {
 		client.getOutputBuffer().put(code);
 		try {
 			client.send(1);
-			client.close();
 		} catch (IOException ex) {}
-		clientDisconnected(client);
+		clientDisconnected(client, null);
+	}
+	@Override
+	public void close() {
+		super.close();
+		instance = null;
 	}
 	@Override
 	public void clientConnected(Client client) {
@@ -54,7 +58,7 @@ public class CardsServer extends Server {
 		}
 	}
 	@Override
-	public void clientDisconnected(Client client) {
+	public void clientDisconnected(Client client, IOException ex) {
 		for (int i = 0; i < count; i++) {
 			if (players[i] == client) {
 				players[i] = null;
@@ -67,6 +71,7 @@ public class CardsServer extends Server {
 				break;
 			}
 		}
+		System.out.println("client disconnected");
 	}
 	@Override
 	public void dataRecieved(Client client, ByteBuffer data) {

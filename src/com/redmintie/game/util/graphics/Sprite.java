@@ -82,6 +82,12 @@ public class Sprite implements Resource {
 	public Sprite(String path) throws IOException {
 		this(path, FILTER_LINEAR, WRAP_CLAMP);
 	}
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	public void setHeight(int height) {
+		this.height = height;
+	}
 	public int getWidth() {
 		return width;
 	}

@@ -5,9 +5,9 @@ import com.redmintie.game.util.core.Scene;
 import com.redmintie.game.util.graphics.Canvas;
 
 public class StandardScene extends Scene {
-	private int frames;
-	private double time;
-	private int fps;
+	private static int frames;
+	private static double time;
+	private static int fps;
 	
 	@Override
 	public void update(double delta) {

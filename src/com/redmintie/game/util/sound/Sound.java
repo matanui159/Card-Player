@@ -60,8 +60,11 @@ public class Sound implements Resource {
 		}
 		context.makeCurrent();
 		if (Flags.DEBUG) {
-			System.err.println("[OPENAL] Supported Extensions:\n[OPENAL]\t"
-					+ alGetString(AL_EXTENSIONS).replace(" ", "\n[OPENAL]\t"));
+			System.err.println("[OPENAL] Supported OpenAL Extensions:");
+			String[] extensions = alGetString(AL_EXTENSIONS).split(" ");
+			for (String ext : extensions) {
+				System.err.println("[OPENAL]\t" + ext);
+			}
 		}
 		
 		alEnable(AL_SOURCE_DISTANCE_MODEL);

@@ -17,14 +17,13 @@ import org.lwjgl.BufferUtils;
 public abstract class Client {
 	private Server server;
 	SocketChannel channel;
-	private Selector selector;
 	private SelectionKey key;
+	private Selector selector;
+	private boolean connected;
 	
 	private ByteBuffer size = BufferUtils.createByteBuffer(2).order(ByteOrder.BIG_ENDIAN);
 	private ByteBuffer data;
 	private ByteBuffer output = BufferUtils.createByteBuffer(65535).order(ByteOrder.BIG_ENDIAN);
-	
-	private boolean close;
 	
 	public Client(String address, int port) throws IOException {
 		channel = SocketChannel.open();
@@ -47,7 +46,6 @@ public abstract class Client {
 			size.rewind();
 			int s = size.getShort(0) & 0xFFFF;
 			if (s == 0) {
-				close = true;
 				return null;
 			}
 			data = memAlloc(s).order(ByteOrder.BIG_ENDIAN);
@@ -63,29 +61,46 @@ public abstract class Client {
 		memFree(data);
 		data = null;
 	}
-	boolean closeRequested() {
-		return close;
-	}
 	public ByteBuffer getOutputBuffer() {
 		return output;
 	}
-	public void update() throws IOException {
-		if (selector.select() > 0) {
-			if ((key.readyOps() & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
+	private void update() throws IOException {
+		if ((key.readyOps() & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT && !connected) {
+			try {
 				channel.finishConnect();
+				clientConnected();
+			} catch (IOException ex) {
+				close();
+				clientFailed(ex);
 			}
-			if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-				ByteBuffer data = read();
+			connected = true;
+			return;
+		}
+		if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+			ByteBuffer data = null;
+			try {
+				data = read();
 				if (data != null) {
 					dataRecieved(data);
+				}
+			} catch (IOException ex) {
+				clientDisconnected();
+			} finally {
+				if (data != null) {
 					freeData();
 				}
-				if (closeRequested()) {
-					channel.close();
-					selector.close();
-					clientDisconnected();
-				}
 			}
+		}
+		selector.selectedKeys().clear();
+	}
+	public void update(int timeout) throws IOException {
+		if (selector.select(timeout) > 0) {
+			update();
+		}
+	}
+	public void updateNow() throws IOException {
+		if (selector.selectNow() > 0) {
+			update();
 		}
 	}
 	public void send(int size) throws IOException {
@@ -101,16 +116,21 @@ public abstract class Client {
 		}
 		memFree(s);
 	}
-	public void close() throws IOException {
-		send(0);
-		channel.close();
+	public void close() {
+		try {
+			channel.close();
+		} catch (IOException ex) {}
 		if (server == null) {
-			selector.close();
+			try {
+				selector.close();
+			} catch (IOException ex) {}
 		} else {
+			channel.keyFor(server.selector).cancel();
 			server.clients.remove(this);
 		}
 	}
 	
+	public abstract void clientFailed(IOException ex);
 	public abstract void clientConnected();
 	public abstract void clientDisconnected();
 	public abstract void dataRecieved(ByteBuffer data);
