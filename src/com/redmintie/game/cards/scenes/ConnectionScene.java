@@ -20,8 +20,7 @@ public class ConnectionScene extends NetScene {
 		try {
 			new CardsClient(address, host);
 		} catch (IOException ex) {
-			ex.printStackTrace();
-			Game.setScene(new ErrorScene(ex.getMessage()));
+			Game.setScene(new ErrorScene(ex));
 		}
 	}
 	@Override

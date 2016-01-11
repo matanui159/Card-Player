@@ -4,7 +4,6 @@ import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,17 +24,23 @@ public abstract class Server {
 	private ByteBuffer output = BufferUtils.createByteBuffer(65535).order(ByteOrder.BIG_ENDIAN);
 	
 	public Server(int port) throws IOException {
-		init(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
-	}
-	public Server() throws IOException {
-		init(null);
-	}
-	private void init(InetSocketAddress address) throws IOException {
 		channel = ServerSocketChannel.open();
 		channel.configureBlocking(false);
 		selector = Selector.open();
 		channel.register(selector, SelectionKey.OP_ACCEPT);
-		channel.bind(address);
+		channel.bind(new InetSocketAddress(port));
+	}
+	public String getAddress() {
+		try {
+			return ((InetSocketAddress)channel.getLocalAddress()).getAddress().getHostAddress();
+		} catch (IOException ex) {}
+		return null;
+	}
+	public int getPort() {
+		try {
+			return ((InetSocketAddress)channel.getLocalAddress()).getPort();
+		} catch (IOException ex) {}
+		return 0;
 	}
 	private void update() throws IOException {
 		Set<SelectionKey> keys = selector.selectedKeys();

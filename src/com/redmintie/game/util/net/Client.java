@@ -37,6 +37,18 @@ public abstract class Client {
 		this.channel = channel;
 		channel.configureBlocking(false);
 	}
+	public String getAddress() {
+		try {
+			return ((InetSocketAddress)channel.getRemoteAddress()).getAddress().getHostAddress();
+		} catch (IOException ex) {}
+		return null;
+	}
+	public int getPort() {
+		try {
+			return ((InetSocketAddress)channel.getRemoteAddress()).getPort();
+		} catch (IOException ex) {}
+		return 0;
+	}
 	ByteBuffer read() throws IOException {
 		if (data == null) {
 			channel.read(size);
