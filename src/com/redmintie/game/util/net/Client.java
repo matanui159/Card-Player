@@ -84,6 +84,7 @@ public abstract class Client {
 					dataRecieved(data);
 				}
 			} catch (IOException ex) {
+				close();
 				clientDisconnected();
 			} finally {
 				if (data != null) {
@@ -125,7 +126,6 @@ public abstract class Client {
 				selector.close();
 			} catch (IOException ex) {}
 		} else {
-			channel.keyFor(server.selector).cancel();
 			server.clients.remove(this);
 		}
 	}

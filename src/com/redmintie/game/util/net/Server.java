@@ -57,7 +57,7 @@ public abstract class Server {
 					}
 				} catch (IOException ex) {
 					client.close();
-					clientDisconnected(client, ex);
+					clientDisconnected(client);
 				} finally {
 					if (data != null) {
 						client.freeData();
@@ -107,7 +107,7 @@ public abstract class Server {
 	}
 	
 	public abstract void clientConnected(Client client);
-	public abstract void clientDisconnected(Client client, IOException ex);
+	public abstract void clientDisconnected(Client client);
 	public abstract void dataRecieved(Client client, ByteBuffer data);
 	
 	private class ClientConnection extends Client {

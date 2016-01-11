@@ -28,7 +28,7 @@ public class CardsServer extends Server {
 		try {
 			client.send(1);
 		} catch (IOException ex) {}
-		clientDisconnected(client, null);
+		clientDisconnected(client);
 	}
 	@Override
 	public void close() {
@@ -58,7 +58,7 @@ public class CardsServer extends Server {
 		}
 	}
 	@Override
-	public void clientDisconnected(Client client, IOException ex) {
+	public void clientDisconnected(Client client) {
 		for (int i = 0; i < count; i++) {
 			if (players[i] == client) {
 				players[i] = null;
