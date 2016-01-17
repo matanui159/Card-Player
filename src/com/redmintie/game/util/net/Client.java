@@ -98,6 +98,7 @@ public abstract class Client {
 			} catch (IOException ex) {
 				close();
 				clientDisconnected();
+				return;
 			} finally {
 				if (data != null) {
 					freeData();

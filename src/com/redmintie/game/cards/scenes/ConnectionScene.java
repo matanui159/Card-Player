@@ -1,6 +1,7 @@
 package com.redmintie.game.cards.scenes;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import com.redmintie.game.cards.Res;
 import com.redmintie.game.cards.net.CardsClient;
@@ -19,6 +20,8 @@ public class ConnectionScene extends NetScene {
 	public void init() {
 		try {
 			new CardsClient(address, host);
+		} catch (UnknownHostException ex) {
+			Game.setScene(new ErrorScene("UNKNOWN HOST: " + address));
 		} catch (IOException ex) {
 			Game.setScene(new ErrorScene(ex));
 		}
