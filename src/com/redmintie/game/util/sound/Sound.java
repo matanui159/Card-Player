@@ -37,7 +37,7 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.openal.ALContext;
 
-import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Settings;
 import com.redmintie.game.util.core.Resource;
 import com.redmintie.game.util.core.ResourceManager;
 import com.redmintie.game.util.sound.codec.Codec;
@@ -59,7 +59,7 @@ public class Sound implements Resource {
 			throw new RuntimeException("Could not initialise OpenAL.");
 		}
 		context.makeCurrent();
-		if (Flags.DEBUG) {
+		if (Settings.DEBUG) {
 			System.err.println("[OPENAL] Supported OpenAL Extensions:");
 			String[] extensions = alGetString(AL_EXTENSIONS).split(" ");
 			for (String ext : extensions) {

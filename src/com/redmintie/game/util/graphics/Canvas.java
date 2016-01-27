@@ -30,13 +30,13 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
 
-import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Settings;
 import com.redmintie.game.util.core.Game;
 
 public class Canvas {
 	public static void init() {
 		GL.createCapabilities();
-		if (Flags.DEBUG) {
+		if (Settings.DEBUG) {
 			GLUtil.setupDebugMessageCallback();
 			System.err.println("[OPENGL] OpenGL Renderer: " + glGetString(GL_RENDERER) + ".");
 			System.err.println("[OPENGL] OpenGL Version : " + glGetString(GL_VERSION) + ".");

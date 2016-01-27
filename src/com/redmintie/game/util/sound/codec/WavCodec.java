@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Settings;
 
 /** 
  * Supported audio formats:
@@ -41,7 +41,7 @@ public class WavCodec implements Codec {
 	private static final int TYPE_MULAW = 7;
 	
 	private static void log(String msg) {
-		if (Flags.DEBUG) {
+		if (Settings.DEBUG) {
 			System.err.println("[CODEC] " + msg);
 		}
 	}

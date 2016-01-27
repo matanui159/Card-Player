@@ -7,6 +7,7 @@ public class Main {
 	public static void main(String[] args) {
 		setFlag("com.redmintie.DEBUG", "true");
 		setFlag("com.redmintie.LOG", "log.txt");
+		setFlag("com.redmintie.emulate.SCALEFACTOR", "2");
 		Game.init();
 		Res.init();
 		

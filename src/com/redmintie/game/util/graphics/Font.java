@@ -47,7 +47,8 @@ public class Font implements Resource {
 	
 	public Font(String path, int size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
-		size *= Game.getScaleFactor();
+		int scale = Game.getScaleFactor();
+		size *= scale;
 		
 		STBTTFontinfo info = STBTTFontinfo.malloc();
 		IntBuffer ascent = memAllocInt(1);
@@ -55,11 +56,11 @@ public class Font implements Resource {
 		IntBuffer linegap = memAllocInt(1);
 		
 		stbtt_InitFont(info, buffer);
-		float scale = stbtt_ScaleForPixelHeight(info, size);
+		float s = stbtt_ScaleForPixelHeight(info, size) / scale;
 		stbtt_GetFontVMetrics(info, ascent, descent, linegap);
-		this.ascent = (int)(ascent.get() * scale);
-		this.descent = -(int)(descent.get() * scale);
-		this.linegap = (int)(linegap.get() * scale);
+		this.ascent = (int)(ascent.get() * s);
+		this.descent = -(int)(descent.get() * s);
+		this.linegap = (int)(linegap.get() * s);
 		
 		info.free();
 		memFree(ascent);
@@ -121,9 +122,14 @@ public class Font implements Resource {
 		return width;
 	}
 	public void drawText(String text, double x, double y) {
-		xBuffer.put((float)x).flip();
-		yBuffer.put((float)y).flip();
+		int scale = Game.getScaleFactor();
+		xBuffer.put((float)x * scale).flip();
+		yBuffer.put((float)y * scale).flip();
 		
+		if (scale != 1) {
+			Canvas.pushMatrix();
+			Canvas.scale(1 / scale, 1 / scale);
+		}
 		for (int i = 0; i < text.length(); i++) {
 			int c = text.charAt(i);
 			if (c < CHARACTERS) {
@@ -131,6 +137,9 @@ public class Font implements Resource {
 				TextureUtil.drawTexture(bitmaps[c], QUAD.x0(), QUAD.y0(), QUAD.x1(), QUAD.y1(),
 						QUAD.s0(), QUAD.t0(), QUAD.s1(), QUAD.t1());
 			}
+		}
+		if (scale != 1) {
+			Canvas.popMatrix();
 		}
 	}
 	@Override

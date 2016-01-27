@@ -20,7 +20,7 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL;
 
-import com.redmintie.game.util.core.Flags;
+import com.redmintie.game.util.core.Settings;
 import com.redmintie.game.util.core.Resource;
 import com.redmintie.game.util.core.ResourceManager;
 
@@ -52,12 +52,12 @@ public class Sprite implements Resource {
 		int w = this.width;
 		int h = this.height;
 		boolean resized = false;
-		if (!GL.getCapabilities().GL_ARB_texture_non_power_of_two || Flags.FORCE_PoT_TEXTURES) {
+		if (!GL.getCapabilities().GL_ARB_texture_non_power_of_two || Settings.FORCE_PoT_TEXTURES) {
 			if (!mathIsPoT(w) || !mathIsPoT(h)) {
 				w = mathRoundPoT(w);
 				h = mathRoundPoT(h);
 				resized = true;
-				if (Flags.DEBUG) {
+				if (Settings.DEBUG) {
 					System.err.println("[SPRITE] NPoT textures are not supported. "
 							+ "Resizing \"" + path + "\" to " + w + "x" + h + ".");
 					System.err.println("[SPRITE]\tTexture may look fuzzy.");

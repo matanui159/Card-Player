@@ -84,19 +84,19 @@ public class Game {
 	private static Scene scene;
 	
 	public static void init() {
-		if (Flags.LOG != null) {
+		if (Settings.LOG != null) {
 			try {
-				FileOutputStream file = new FileOutputStream(Flags.LOG);
+				FileOutputStream file = new FileOutputStream(Settings.LOG);
 				System.setOut(new PrintStream(new DualOutputStream(System.out, file)));
 				System.setErr(new PrintStream(new DualOutputStream(System.err, file)));
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
 		}
-		if (Flags.TRACK_LEAKS) {
+		if (Settings.TRACK_LEAKS) {
 			Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
 		}
-		if (Flags.DEBUG) {
+		if (Settings.DEBUG) {
 			Configuration.DEBUG.set(true);
 		}
 		
@@ -129,8 +129,8 @@ public class Game {
 			glfwGetWindowSize(window, size, null);
 			int width = size.get(0);
 			glfwGetFramebufferSize(window, size, null);
-			scale = size.get(0) / width;
-			if (Flags.DEBUG) {
+			scale = Settings.SCALE_FACTOR == 0 ? size.get(0) / width : Settings.SCALE_FACTOR;
+			if (Settings.DEBUG) {
 				System.err.println("[WINDOW] Scale Factor: " + scale);
 			}
 		} else {
@@ -260,20 +260,17 @@ public class Game {
 		}
 		
 		double last = glfwGetTime();
-		double min = Flags.FPS_LIMIT == 0 ? 0 : 1.0 / Flags.FPS_LIMIT;
+		double min = Settings.FPS_LIMIT == 0 ? 0 : 1.0 / Settings.FPS_LIMIT;
 		while (glfwWindowShouldClose(window) == GLFW_FALSE) {
 			double delta = glfwGetTime() - last;
 			while (min > 0 && delta < min) {
-				
 				try {
 					Thread.sleep((int)Math.floor((min - delta) * 1000 + 0.5));
 				} catch (InterruptedException ex) {}
 				delta = glfwGetTime() - last;
 			}
 			last = glfwGetTime();
-			
 			glfwPollEvents();
-			
 			
 			if (scene != null) {
 				scene.update(delta);
