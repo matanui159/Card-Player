@@ -8,5 +8,5 @@ public class Settings {
 	public static final int FPS_LIMIT = Integer.getInteger("com.redmintie.FPSLIMIT", 120);
 	
 	public static final boolean FORCE_PoT_TEXTURES = Boolean.getBoolean("com.redmintie.emulate.PoTTEXTURES");
-	public static final int SCALE_FACTOR = Integer.getInteger("com.redmintie.emulate.SCALEFACTOR");
+	public static final int SCALE_FACTOR = Integer.getInteger("com.redmintie.emulate.SCALEFACTOR", 0);
 }

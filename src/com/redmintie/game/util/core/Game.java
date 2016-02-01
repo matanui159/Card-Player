@@ -225,11 +225,11 @@ public class Game {
 	}
 	public static int getWidth() {
 		glfwGetWindowSize(window, size, null);
-		return size.get(0);
+		return Settings.SCALE_FACTOR == 0 ? size.get(0) : size.get(0) / Settings.SCALE_FACTOR;
 	}
 	public static int getHeight() {
 		glfwGetWindowSize(window, null, size);
-		return size.get(0);
+		return Settings.SCALE_FACTOR == 0 ? size.get(0) : size.get(0) / Settings.SCALE_FACTOR;
 	}
 	public static int getScaleFactor() {
 		return scale;

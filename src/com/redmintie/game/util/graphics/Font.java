@@ -47,8 +47,6 @@ public class Font implements Resource {
 	
 	public Font(String path, int size, int filter) throws IOException {
 		ByteBuffer buffer = ResourceManager.getResourceAsBuffer(path);
-		int scale = Game.getScaleFactor();
-		size *= scale;
 		
 		STBTTFontinfo info = STBTTFontinfo.malloc();
 		IntBuffer ascent = memAllocInt(1);
@@ -56,7 +54,7 @@ public class Font implements Resource {
 		IntBuffer linegap = memAllocInt(1);
 		
 		stbtt_InitFont(info, buffer);
-		float s = stbtt_ScaleForPixelHeight(info, size) / scale;
+		float s = stbtt_ScaleForPixelHeight(info, size);
 		stbtt_GetFontVMetrics(info, ascent, descent, linegap);
 		this.ascent = (int)(ascent.get() * s);
 		this.descent = -(int)(descent.get() * s);
@@ -71,8 +69,9 @@ public class Font implements Resource {
 		ByteBuffer rgba = memAlloc(BITMAP_SIZE * BITMAP_SIZE * 4);
 		int offset = 0;
 		int diff;
+		int scale = Game.getScaleFactor();
 		
-		while ((diff = -stbtt_BakeFontBitmap(buffer, size, data,
+		while ((diff = -stbtt_BakeFontBitmap(buffer, size * scale, data,
 				BITMAP_SIZE, BITMAP_SIZE, offset, chars)) > 0) {
 			Arrays.fill(bitmaps, offset, offset + diff, getBitmap(data, rgba, filter));
 			offset += diff;
@@ -112,24 +111,29 @@ public class Font implements Resource {
 		return linegap;
 	}
 	public int getTextWidth(String text) {
+		int scale = Game.getScaleFactor();
 		int width = 0;
 		for (int i = 0; i < text.length(); i++) {
 			int c = text.charAt(i);
 			if (c < CHARACTERS) {
-				width += chars.get(c).xadvance();
+				width += scale == 1 ? chars.get(c).xadvance() : chars.get(c).xadvance() / scale;
 			}
 		}
 		return width;
 	}
 	public void drawText(String text, double x, double y) {
 		int scale = Game.getScaleFactor();
-		xBuffer.put((float)x * scale).flip();
-		yBuffer.put((float)y * scale).flip();
-		
-		if (scale != 1) {
+		if (scale == 1) {
+			xBuffer.put(0, (float)x);
+			yBuffer.put(0, (float)y);
+		} else {
+			xBuffer.put(0, 0);
+			yBuffer.put(0, 0);
 			Canvas.pushMatrix();
-			Canvas.scale(1 / scale, 1 / scale);
+			Canvas.translate(x, y);
+			Canvas.scale(1.0 / scale, 1.0 / scale);
 		}
+		
 		for (int i = 0; i < text.length(); i++) {
 			int c = text.charAt(i);
 			if (c < CHARACTERS) {
@@ -138,6 +142,7 @@ public class Font implements Resource {
 						QUAD.s0(), QUAD.t0(), QUAD.s1(), QUAD.t1());
 			}
 		}
+		
 		if (scale != 1) {
 			Canvas.popMatrix();
 		}

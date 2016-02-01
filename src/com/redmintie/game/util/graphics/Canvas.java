@@ -23,15 +23,14 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotated;
 import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
 
-import com.redmintie.game.util.core.Settings;
 import com.redmintie.game.util.core.Game;
+import com.redmintie.game.util.core.Settings;
 
 public class Canvas {
 	public static void init() {
@@ -53,9 +52,10 @@ public class Canvas {
 	public static void resize() {
 		int width = Game.getWidth();
 		int height = Game.getHeight();
+		int scale = Game.getScaleFactor();
 		
 		if (width > 0 && height > 0) {
-			glViewport(0, 0, width, height);
+			glViewport(0, 0, width * scale, height * scale);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0, width, height, 0, 1, -1);
@@ -81,7 +81,6 @@ public class Canvas {
 	}
 	public static void resetMatrix() {
 		glLoadIdentity();
-		glScalef(Game.getScaleFactor(), Game.getScaleFactor(), 0);
 	}
 	public static void translate(double x, double y) {
 		glTranslated(x, y, 0);

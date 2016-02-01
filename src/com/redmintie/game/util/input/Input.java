@@ -16,6 +16,8 @@ import java.nio.DoubleBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import com.redmintie.game.util.core.Settings;
+
 public class Input {
 	/* GENERATED CODE BEGINS HERE */
 	public static final int KEY_UNKNOWN = -1;
@@ -170,11 +172,11 @@ public class Input {
 	}
 	public static double getCursorX() {
 		glfwGetCursorPos(WindowAccess.getWindow(), pos, null);
-		return pos.get(0);
+		return Settings.SCALE_FACTOR == 0 ? pos.get(0) : pos.get(0) / Settings.SCALE_FACTOR;
 	}
 	public static double getCursorY() {
 		glfwGetCursorPos(WindowAccess.getWindow(), null, pos);
-		return pos.get(0);
+		return Settings.SCALE_FACTOR == 0 ? pos.get(0) : pos.get(0) / Settings.SCALE_FACTOR;
 	}
 	public static void setCursor(Cursor cursor) {
 		Input.cursor = cursor;
